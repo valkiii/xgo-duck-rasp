@@ -25,8 +25,8 @@ In `cad/head_v2/`:
 - `head_v2.stl` and `head_servo_support_v2.stl`, replacing `head.stl` and `head_servo_support.stl`: they only add an 8 × 5.6 mm cable slot each. You can cut these slots into your existing parts with a knife or drill instead (positions in `cad/head_v2/README.md`).
 
 ## What goes where
-- **Torso, back of the battery box:** URT-2, MPU6050, UBEC, the 2 power Wago clamps, the servo Y cable (3 Wago clamps).
+- **Torso, back of the battery box:** URT-2, MPU6050, UBEC. No Wago clamps for power: the 2S battery (XH plug = on/off) and the UBEC input are clamped in the URT-2 blue screw terminal (V1/G). The servo Y is gone: the legs sit on URT-2 TTL port 1 and the neck chain on TTL port 2, using a cut Waveshare 5264 cable; joints are made with solder-seal sleeves.
 - **Head:** Pi Zero 2W on the tray (no PiSugar), camera behind the eye, ribbon from the camera over the top of the Pi to its camera connector.
 - **Pi jumper wires in the head:** header → right side of the Pi → around its back end → down through the cable slot next to spacer A (drawings: `cad/head_v2/c2_wire_route.png`, `cad/head_v2/c3_cable_routes.png` = USB + Dupont with the beak). Use ~40 cm female-female jumpers so they reach the torso without joints.
 - **Through the neck:** the link to the URT-2 (USB cable, or 4 thin wires), the 5 MPU6050 wires and the 2 UBEC power wires. Leave a little slack at each joint.
-- Wiring diagram: `wiring_v1.png`. Build details: `cad/head_v2/README.md`.
+- Wiring diagram: `wiring_v1.png` / `wiring_v1.svg` are OUTDATED on power and servo wiring (they still show Wago clamps, a servo Y and a PiSugar); follow the text above and `pi_runtime/README.md`. Build details: `cad/head_v2/README.md`.

@@ -12,7 +12,7 @@ The UNO Q is two computers: Linux runs the 50 Hz policies and web UI, and an STM
 | `xgoduck_pi/web.py` | Arduino App Lab's WebUI brick: same `/api/...` routes, serves upstream `assets/` |
 | `run.py` | upstream `main.py` |
 
-**Status:** tested in simulation only (28 tests on macOS, including the real upstream controller and policies driving simulated servos). **It has not yet run on a Pi, the URT-2, real servos or the MPU6050.** Loop timing on the Pi Zero 2 W is unmeasured.
+**Status:** 48 tests on macOS (`python -m pytest tests/`), including the real upstream controller and policies driving simulated servos. **It has run on the Pi Zero 2 W** with the URT-2 and all 15 servos: 99.8 Hz servo feedback, 50 Hz policy, about 0 tick overruns. Not yet verified on the real robot: the battery/temperature reads (register addresses are taken from the Feetech SDK, see below), IMU brownout detection after a real power dip, and walking on battery.
 
 ## Guided setup (start here)
 
@@ -27,15 +27,19 @@ The wizard runs on the Mac and goes through every step below. It gives each serv
 
 ```
 URT-2  USB-C ──── micro-USB OTG cable ──── Pi Zero "USB" port (not "PWR")
-URT-2  power terminal ── switch ── 2S battery (7.4–8.4 V)
-URT-2  TTL bus ports ─── servo chains (IDs 10–14, 20–24, 30–34)
+2S battery (7.4–8.4 V) ── XH plug ── URT-2 blue screw terminal V1/G
+         (the XH plug is the on/off switch; there is no switch and no battery monitor)
+UBEC 5 V ── from the same URT-2 terminal ── Pi pins 4 (5 V) and 14 (GND)
+URT-2  TTL port 1 ─── legs
+URT-2  TTL port 2 ─── neck chain (cut Waveshare 5264 cable, solder-seal joints)
 
 MPU6050  VCC → pin 1 (3.3 V)   GND → pin 6   SDA → pin 3   SCL → pin 5
-         AD0 → pin 17 (3.3 V)  → address 0x69 (the PiSugar 3 clock uses 0x68)
-PiSugar 3 powers the Pi only.
+         AD0 → pin 17 (3.3 V)  → address 0x69 (kept from the PiSugar days; no PiSugar any more)
 ```
 
-The Pi and the servos then share ground through the USB cable.
+The PiSugar was removed: the Pi is powered by the UBEC. The Pi and the servos share ground through the USB cable and the UBEC.
+
+Because the battery goes straight into the URT-2, the software watches the pack voltage (see Battery and temperature).
 
 ## Pi setup
 
@@ -76,7 +80,29 @@ It boots in **inference only**, with torque off. From there, follow upstream's R
 
 Closing the page turns torque off after 1 s.
 
-`/api/status` has an extra `pi` block with bus connection, adapter echo and IMU errors.
+`/api/status` has an extra `pi` block with bus connection, adapter echo and IMU errors, plus: `bus_voltage` (V, or null), `servo_temps` (per ID, deg C), `servo_temp_max`, `low_battery`, `battery_warn`, `battery_warn_v`, `battery_cutoff_v`, `arm_refused_battery`.
+
+## Battery and temperature
+
+About once a second the control loop sweeps the 15 servos with one 2-byte read each (one small packet per 10 ms tick, only after all feedback replies are in). Register 0x3E is the present voltage in 0.1 V units and 0x3F the present temperature in deg C; both addresses come from the Feetech SDK (`SMS_STS_PRESENT_VOLTAGE = 62`, `SMS_STS_PRESENT_TEMPERATURE = 63`, identical in the SCSCL table) and sit right behind the 6-byte position/speed/load block the loop already reads. The HD-1910 is untested here. The upstream sketch never reads them. `bus_voltage` is the median of the last 5 s of servo readings.
+
+```
+[battery]
+warn_v = 7.0     # status flag battery_warn
+cutoff_v = 6.6   # 2S; below this for ~3 s: low_battery, new ARM commands refused
+```
+
+A walking robot is **not** switched limp when the battery drops (it would fall); it is only flagged, and the refusal applies to the next arm. Upstream sends ARM once per mode change, so after a refusal select shadow and then hold/policy again once the pack is charged. Length-4 replies (this read and the boot KP/KD read) are told apart by the pending request, not by length.
+
+## IMU health and gyro bias
+
+A power dip makes the MPU6050 reset into sleep and return zeros without an I2C error. About once a second the driver reads PWR_MGMT_1; if the sleep bit is set, or the accelerometer magnitude is under 0.3 g for 20 samples in a row, the IMU is marked lost (`imu.ok` false, so the robot disarms) and re-initialised by the existing 1 s re-probe.
+
+Gyro zero-rate offset: with the robot still, `python tools/imu_check.py --bias` averages 5 s of raw gyro and prints `gyro_bias = [...]` (sensor frame, deg/s); `--write` puts it into config.toml. The driver subtracts it before the axis mapping. MPU6050 only.
+
+## Network exposure
+
+The web UI has no login and listens on every interface by default (`http_host = "0.0.0.0"` in config.toml), so anyone on the LAN can arm the robot. To restrict it set `http_host` to the Pi's Tailscale address (or `"127.0.0.1"` and use `ssh -L 9527:localhost:9527`), then restart the service.
 
 ## Without hardware
 
@@ -95,3 +121,5 @@ The simulated robot doesn't fall or walk, but the servos follow the commanded ta
 - If the USB adapter disconnects, the loop keeps reporting (with no servos) and reconnects every second. Torque goes off as on any feedback loss.
 - Angle-to-encoder conversion uses double precision instead of the STM32's float; the result can differ by at most 1 encoder step (0.09°).
 - On exit, torque off is sent three times.
+- Added: servo voltage/temperature monitoring with ARM refusal on low battery, IMU brownout detection, gyro bias, and `http_host`.
+- A `CAL_SET_ZEROS` packet is applied even while the servo adapter is closed (the firmware has no such state), so the controller's one-time zero push cannot be lost.
