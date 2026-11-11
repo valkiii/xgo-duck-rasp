@@ -78,7 +78,7 @@ def main() -> int:
     from xgoduck_pi.mcu import VirtualMCU, ZERO_POS, DEFAULT_DEG
     from xgoduck_pi import web
 
-    bus_cfg, imu_cfg = cfg.get('servo_bus', {}), cfg.get('imu', {})
+    bus_cfg, imu_cfg, bat_cfg = cfg.get('servo_bus', {}), cfg.get('imu', {}), cfg.get('battery', {})
     if args.sim:
         from xgoduck_pi.sim import SimSerial, SimImu
         open_port = lambda: SimSerial(zero_pos=ZERO_POS, default_deg=DEFAULT_DEG)  # noqa: E731
@@ -100,11 +100,14 @@ def main() -> int:
             address = str(imu_cfg.get('address', 'auto'))
             imu = make_imu(imu_cfg.get('type', 'mpu6050'), bus_number=int(imu_cfg.get('i2c_bus', 1)),
                            address=None if address == 'auto' else int(address, 0),
-                           axes=imu_cfg.get('axes', '-z,-x,+y'), dlpf=int(imu_cfg.get('dlpf', 2)))
+                           axes=imu_cfg.get('axes', '-z,-x,+y'), dlpf=int(imu_cfg.get('dlpf', 2)),
+                           gyro_bias=imu_cfg.get('gyro_bias', (0.0, 0.0, 0.0)))
         label = 'RASPBERRY PI'
 
     mcu = VirtualMCU(open_port, imu, echo=bus_cfg.get('echo', 'auto'),
-                     realtime=bool(cfg.get('realtime', True)))
+                     realtime=bool(cfg.get('realtime', True)),
+                     battery_warn_v=float(bat_cfg.get('warn_v', 7.0)),
+                     battery_cutoff_v=float(bat_cfg.get('cutoff_v', 6.6)))
     log.info('loading policies (takes a few seconds on a Pi Zero)')
     controller = Controller(mcu)
     log.info('%s', controller.model_message)
@@ -118,10 +121,11 @@ def main() -> int:
     worker.start()
 
     http_port = args.http_port or int(cfg.get('http_port', 9527))
-    server = web.Server(('0.0.0.0', http_port), web.make_routes(controller), upstream / 'assets',
+    http_host = str(cfg.get('http_host', '0.0.0.0'))
+    server = web.Server((http_host, http_port), web.make_routes(controller), upstream / 'assets',
                         mcu=mcu, label=label)
     web.serve(server)
-    log.info('web UI on http://0.0.0.0:%d/', http_port)
+    log.info('web UI on http://%s:%d/', http_host, http_port)
 
     stop = threading.Event()
     for sig in (signal.SIGINT, signal.SIGTERM):

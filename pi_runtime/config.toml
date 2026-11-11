@@ -5,6 +5,9 @@ upstream = "upstream"
 
 # Web control page port (same as the UNO Q app).
 http_port = 9527
+# Interface the web UI listens on. "0.0.0.0" = every network (anyone on the LAN can arm the robot);
+# use the Tailscale/LAN address of the Pi, or "127.0.0.1" with an SSH tunnel, to restrict it.
+http_host = "0.0.0.0"
 
 # Run the 100 Hz servo/IMU thread with real-time priority when allowed.
 realtime = true
@@ -20,7 +23,7 @@ echo = "auto"
 # "mpu6050" (GY-521 and similar) or "qmi8658" (the chip on the Luwu driver board).
 type = "mpu6050"
 i2c_bus = 1
-# MPU6050 with AD0 wired to 3.3 V -> 0x69 (0x68 is taken by the PiSugar 3 clock).
+# MPU6050 with AD0 wired to 3.3 V (Pi pin 17) -> 0x69.
 address = "0x69"
 # Which sensor axis points along body x (forward), y (left), z (up).
 # "-z,-x,+y" = board flat on the robot's back, components facing out (backwards),
@@ -28,3 +31,13 @@ address = "0x69"
 axes = "-z,-x,+y"
 # MPU6050 digital low-pass filter setting 0..6 (2 = ~94 Hz, ~3 ms delay).
 dlpf = 2
+# Gyro zero-rate offset in the SENSOR frame, deg/s, subtracted before the axis mapping.
+# Measure with: python tools/imu_check.py --bias   (robot at rest; add --write to save it here).
+gyro_bias = [0.0, 0.0, 0.0]
+
+[battery]
+# 2S pack feeding the URT-2 directly (no switch, no monitor); read from the servos' voltage register.
+# Below warn_v the status shows a warning; below cutoff_v for ~3 s new ARM commands are refused
+# (an already walking robot is NOT forced limp, only flagged).
+warn_v = 7.0
+cutoff_v = 6.6
