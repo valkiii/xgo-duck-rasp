@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 930" font-family="Helvetica, Arial, sans-serif" font-size="14">
+  <rect width="1100" height="930" fill="#ffffff"/>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0L10 5L0 10z" fill="#555"/></marker>
+  </defs>
+
+  <text x="20" y="32" font-size="20" font-weight="700" fill="#111">XGO-Duck wiring: no rocker switch, no PiSugar</text>
+
+  <!-- ===== PANEL 1: POWER ===== -->
+  <text x="20" y="66" font-size="16" font-weight="700" fill="#b00">1 · POWER</text>
+  <rect x="20" y="76" width="680" height="330" rx="10" fill="#f6f7f9" stroke="#d5d9df"/>
+  <text x="34" y="96" fill="#667" font-size="12">TORSO (back of the battery box)</text>
+  <rect x="700" y="76" width="60" height="330" fill="#eef0f3" stroke="#c7ccd3" stroke-dasharray="5 4"/>
+  <text x="730" y="96" text-anchor="middle" fill="#667" font-size="12">NECK</text>
+  <rect x="760" y="76" width="320" height="330" rx="10" fill="#f6f7f9" stroke="#d5d9df"/>
+  <text x="774" y="96" fill="#667" font-size="12">HEAD</text>
+
+  <!-- battery -->
+  <rect x="40" y="170" width="140" height="120" rx="10" fill="#2b6cb0"/>
+  <text x="110" y="220" text-anchor="middle" fill="#fff" font-weight="700">2S Li-ion</text>
+  <text x="110" y="240" text-anchor="middle" fill="#fff" font-size="12">7.4 V (8.4 V full)</text>
+  <!-- XH plug -->
+  <rect x="192" y="186" width="22" height="88" rx="3" fill="#fff" stroke="#888"/>
+  <text x="110" y="316" text-anchor="middle" font-size="12" fill="#333">white XH plug</text>
+  <text x="110" y="333" text-anchor="middle" font-size="12" fill="#333">plugged in = ON</text>
+  <text x="110" y="350" text-anchor="middle" font-size="12" fill="#333">unplugged = OFF</text>
+  <line x1="180" y1="200" x2="192" y2="200" stroke="#d22" stroke-width="4"/>
+  <line x1="180" y1="260" x2="192" y2="260" stroke="#222" stroke-width="4"/>
+
+  <!-- rails -->
+  <polyline points="214,200 236,200 236,110 600,110" fill="none" stroke="#d22" stroke-width="4"/>
+  <polyline points="214,260 252,260 252,350 600,350" fill="none" stroke="#222" stroke-width="4"/>
+  <rect x="282" y="96" width="76" height="28" rx="4" fill="#ff8a00" stroke="#a85a00"/>
+  <text x="320" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Wago (+)</text>
+  <rect x="282" y="336" width="76" height="28" rx="4" fill="#ff8a00" stroke="#a85a00"/>
+  <text x="320" y="355" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Wago (−)</text>
+  <text x="320" y="146" text-anchor="middle" font-size="11" fill="#555">all RED wires in one clamp</text>
+  <text x="320" y="390" text-anchor="middle" font-size="11" fill="#555">all BLACK wires in one clamp</text>
+
+  <!-- URT-2 -->
+  <line x1="450" y1="110" x2="450" y2="176" stroke="#d22" stroke-width="4"/>
+  <line x1="450" y1="290" x2="450" y2="350" stroke="#222" stroke-width="4"/>
+  <rect x="390" y="176" width="120" height="114" rx="8" fill="#c53030"/>
+  <text x="450" y="210" text-anchor="middle" fill="#fff" font-weight="700">FE-URT-2</text>
+  <text x="450" y="232" text-anchor="middle" fill="#fff" font-size="12">powers the</text>
+  <text x="450" y="248" text-anchor="middle" fill="#fff" font-size="12">15 servos</text>
+  <text x="458" y="168" font-size="12" fill="#b00">V1 screw</text>
+  <text x="458" y="310" font-size="12" fill="#111">G screw (next to V1)</text>
+
+  <!-- UBEC -->
+  <line x1="590" y1="110" x2="590" y2="186" stroke="#d22" stroke-width="4"/>
+  <line x1="590" y1="276" x2="590" y2="350" stroke="#222" stroke-width="4"/>
+  <rect x="548" y="186" width="122" height="90" rx="8" fill="#4a5568"/>
+  <text x="609" y="212" text-anchor="middle" fill="#fff" font-weight="700">UBEC</text>
+  <text x="609" y="230" text-anchor="middle" fill="#fff" font-size="12">5 V / 3 A</text>
+  <text x="609" y="248" text-anchor="middle" fill="#ffd166" font-size="11">jumper on 5 V!</text>
+  <text x="609" y="264" text-anchor="middle" fill="#ffd166" font-size="11">meter: 5.0–5.3 V</text>
+  <text x="598" y="176" font-size="11" fill="#b00">IN +</text>
+  <text x="598" y="296" font-size="11" fill="#111">IN −</text>
+
+  <!-- UBEC out to Pi -->
+  <line x1="670" y1="212" x2="800" y2="212" stroke="#d22" stroke-width="4"/>
+  <line x1="670" y1="252" x2="800" y2="252" stroke="#222" stroke-width="4"/>
+  <text x="684" y="204" font-size="11" fill="#b00">5 V</text>
+  <text x="684" y="270" font-size="11" fill="#111">GND</text>
+  <rect x="800" y="150" width="260" height="170" rx="10" fill="#2f855a"/>
+  <text x="930" y="176" text-anchor="middle" fill="#fff" font-weight="700">Raspberry Pi Zero 2W</text>
+  <circle cx="812" cy="212" r="7" fill="#d22" stroke="#fff"/>
+  <circle cx="812" cy="252" r="7" fill="#222" stroke="#fff"/>
+  <text x="828" y="217" fill="#fff">pin 4 (5 V)</text>
+  <text x="828" y="257" fill="#fff">pin 14 (GND)</text>
+  <text x="930" y="292" text-anchor="middle" fill="#d9f2e4" font-size="12">"PWR IN" micro-USB: leave empty</text>
+
+  <!-- ===== PANEL 2: SIGNALS ===== -->
+  <text x="20" y="446" font-size="16" font-weight="700" fill="#b00">2 · SIGNAL WIRES + PI PIN MAP</text>
+  <rect x="20" y="456" width="680" height="456" rx="10" fill="#f6f7f9" stroke="#d5d9df"/>
+  <text x="34" y="476" fill="#667" font-size="12">TORSO</text>
+  <rect x="700" y="456" width="60" height="456" fill="#eef0f3" stroke="#c7ccd3" stroke-dasharray="5 4"/>
+  <text x="730" y="476" text-anchor="middle" fill="#667" font-size="12">NECK</text>
+  <rect x="760" y="456" width="320" height="456" rx="10" fill="#f6f7f9" stroke="#d5d9df"/>
+  <text x="774" y="476" fill="#667" font-size="12">HEAD</text>
+
+  <!-- URT-2 serial -->
+  <rect x="40" y="490" width="330" height="128" rx="8" fill="#fff" stroke="#e08a00" stroke-width="2"/>
+  <text x="54" y="512" font-weight="700" fill="#b86e00">FE-URT-2 5-pin serial header</text>
+  <text x="54" y="536">TX  →  Pi pin 10 (RXD)</text>
+  <text x="54" y="556">RX  ←  Pi pin 8 (TXD)</text>
+  <text x="54" y="576">GND →  Pi pin 9</text>
+  <text x="54" y="600" font-size="11" fill="#a33">labels to confirm · logic switch must stay on 3V3</text>
+  <line x1="370" y1="554" x2="772" y2="554" stroke="#e08a00" stroke-width="5" marker-end="url(#ar)"/>
+  <text x="520" y="546" font-size="12" fill="#b86e00">3 thin wires</text>
+
+  <!-- IMU -->
+  <rect x="40" y="634" width="330" height="150" rx="8" fill="#fff" stroke="#2f6fd0" stroke-width="2"/>
+  <text x="54" y="656" font-weight="700" fill="#2457a8">MPU6050 (stays on the torso)</text>
+  <text x="54" y="680">VCC →  pin 1 (3.3 V)</text>
+  <text x="54" y="700">SDA →  pin 3</text>
+  <text x="54" y="720">SCL →  pin 5</text>
+  <text x="54" y="740">GND →  pin 6</text>
+  <text x="54" y="760">AD0 →  pin 17 (3.3 V)</text>
+  <line x1="370" y1="708" x2="772" y2="603" stroke="#2f6fd0" stroke-width="5" marker-end="url(#ar)"/>
+  <text x="470" y="690" font-size="12" fill="#2457a8">5 thin wires</text>
+
+  <!-- UBEC -->
+  <rect x="40" y="800" width="330" height="96" rx="8" fill="#fff" stroke="#4a5568" stroke-width="2"/>
+  <text x="54" y="822" font-weight="700" fill="#333">UBEC output (from panel 1)</text>
+  <text x="54" y="846">5 V  →  pin 4</text>
+  <text x="54" y="866">GND →  pin 14</text>
+  <line x1="370" y1="846" x2="772" y2="616" stroke="#666" stroke-width="5" marker-end="url(#ar)"/>
+  <text x="430" y="800" font-size="12" fill="#444">2 wires</text>
+
+  <!-- Pi header map -->
+  <text x="920" y="500" text-anchor="middle" font-weight="700">Pi GPIO header (first 9 columns)</text>
+  <text x="780" y="526" font-size="11" fill="#555">board edge →</text>
+  <g font-size="12" font-weight="700" text-anchor="middle">
+    <!-- even row (board edge) y=540 -->
+    <rect x="790" y="540" width="28" height="28" fill="#ccc"/><text x="804" y="559">2</text>
+    <rect x="822" y="540" width="28" height="28" fill="#d22"/><text x="836" y="559" fill="#fff">4</text>
+    <rect x="854" y="540" width="28" height="28" fill="#2f6fd0"/><text x="868" y="559" fill="#fff">6</text>
+    <rect x="886" y="540" width="28" height="28" fill="#e08a00"/><text x="900" y="559" fill="#fff">8</text>
+    <rect x="918" y="540" width="28" height="28" fill="#e08a00"/><text x="932" y="559" fill="#fff">10</text>
+    <rect x="950" y="540" width="28" height="28" fill="#ccc"/><text x="964" y="559">12</text>
+    <rect x="982" y="540" width="28" height="28" fill="#222"/><text x="996" y="559" fill="#fff">14</text>
+    <rect x="1014" y="540" width="28" height="28" fill="#ccc"/><text x="1028" y="559">16</text>
+    <rect x="1046" y="540" width="28" height="28" fill="#ccc"/><text x="1060" y="559">18</text>
+    <!-- odd row (inner) y=572 -->
+    <rect x="790" y="572" width="28" height="28" fill="#2f6fd0"/><text x="804" y="591" fill="#fff">1</text>
+    <rect x="822" y="572" width="28" height="28" fill="#2f6fd0"/><text x="836" y="591" fill="#fff">3</text>
+    <rect x="854" y="572" width="28" height="28" fill="#2f6fd0"/><text x="868" y="591" fill="#fff">5</text>
+    <rect x="886" y="572" width="28" height="28" fill="#ccc"/><text x="900" y="591">7</text>
+    <rect x="918" y="572" width="28" height="28" fill="#e08a00"/><text x="932" y="591" fill="#fff">9</text>
+    <rect x="950" y="572" width="28" height="28" fill="#ccc"/><text x="964" y="591">11</text>
+    <rect x="982" y="572" width="28" height="28" fill="#ccc"/><text x="996" y="591">13</text>
+    <rect x="1014" y="572" width="28" height="28" fill="#ccc"/><text x="1028" y="591">15</text>
+    <rect x="1046" y="572" width="28" height="28" fill="#2f6fd0"/><text x="1060" y="591" fill="#fff">17</text>
+  </g>
+  <text x="780" y="620" font-size="11" fill="#555">↑ pin 1 end = SD-card end of the board</text>
+  <g font-size="12">
+    <rect x="780" y="636" width="12" height="12" fill="#2f6fd0"/><text x="798" y="647">MPU6050</text>
+    <rect x="870" y="636" width="12" height="12" fill="#e08a00"/><text x="888" y="647">URT-2 serial</text>
+    <rect x="980" y="636" width="12" height="12" fill="#d22"/><text x="998" y="647">5 V in</text>
+    <rect x="780" y="656" width="12" height="12" fill="#222"/><text x="798" y="667">GND in</text>
+    <rect x="870" y="656" width="12" height="12" fill="#ccc"/><text x="888" y="667">unused</text>
+  </g>
+
+  <!-- camera -->
+  <rect x="780" y="700" width="280" height="110" rx="8" fill="#fff" stroke="#6b46c1" stroke-width="2"/>
+  <text x="794" y="722" font-weight="700" fill="#553c9a">USB camera (behind the eye)</text>
+  <text x="794" y="744" font-size="12">5-pin cable → Pi micro-USB port</text>
+  <text x="794" y="762" font-size="12">marked "USB" (the only data port)</text>
+  <text x="794" y="786" font-size="11" fill="#a33">needs a short right-angle cable,</text>
+  <text x="794" y="801" font-size="11" fill="#a33">no OTG adapter (see message)</text>
+  <text x="780" y="840" font-size="12" fill="#333">Through the neck: 10 thin wires.</text>
+  <text x="780" y="858" font-size="12" fill="#333">The camera stays in the head.</text>
+</svg>

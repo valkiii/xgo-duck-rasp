@@ -1,0 +1,106 @@
+{
+ "LiPo (PiSugar 3)": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "PiSugar 3 PCB": {
+  "carrier": -1.6874310854327577e-15,
+  "cover": 0.0
+ },
+ "Pi Zero 2W": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "spacer": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "Pi connectors / header": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "FE-URT-2 PCB": {
+  "carrier": 7.402254807373221e-16,
+  "cover": 0.0
+ },
+ "FE-URT-2 connectors": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "MPU6050 IMU": {
+  "carrier": 7.301017429517387e-16,
+  "cover": 0.0
+ },
+ "screws: boss M3 (x3)": {
+  "carrier": -4.3855977877038654e-17,
+  "cover": 0.0
+ },
+ "screws: URT-2 M3x8 (x4)": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "screws: Pi M2.5x12 (x4)": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "screws: IMU M2.5x6 (x2)": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "screws: cover M3x16 (x2)": {
+  "carrier": 0.0,
+  "cover": 2.572594914873605e-15
+ },
+ "rocker switch (optional)": {
+  "carrier": 0.0,
+  "cover": -2.0872192862952943e-14
+ },
+ "DC jack (optional)": {
+  "carrier": 0.0,
+  "cover": 0.0
+ },
+ "carrier_vs_cover": 0,
+ "battery_overlap": {
+  "carrier": 2.0654305220610402e-05,
+  "cover": 0.0,
+  "min_gap_carrier": 0.0,
+  "min_gap_cover": 0.75855867246489
+ },
+ "outer": [
+  78.4,
+  76.0,
+  24.8
+ ],
+ "carrier_cm3": 10.12239026992691,
+ "cover_cm3": 14.068013180746648,
+ "carrier_g": 12.551763934709369,
+ "cover_g": 17.444336344125844,
+ "watertight": {
+  "carrier": true,
+  "cover": true
+ },
+ "cover_print_bounds": [
+  [
+   -39.20000076293945,
+   -38.0,
+   7.629394644936838e-07
+  ],
+  [
+   39.20000076293945,
+   38.0,
+   24.5
+  ]
+ ],
+ "carrier_bounds": [
+  [
+   -37.349998474121094,
+   -36.150001525878906,
+   0.0
+  ],
+  [
+   37.349998474121094,
+   36.150001525878906,
+   14.0
+  ]
+ ]
+}

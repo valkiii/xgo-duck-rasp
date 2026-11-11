@@ -1,0 +1,115 @@
+{
+ "watertight": true,
+ "winding_consistent": true,
+ "volume_mm3": 17113.652576444412,
+ "bounds": [
+  [
+   -26.886,
+   -29.6,
+   -35.001
+  ],
+  [
+   27.003,
+   4.4,
+   36.5
+  ]
+ ],
+ "orig_bounds": [
+  [
+   -26.886,
+   -24.6,
+   -35.001
+  ],
+  [
+   27.003,
+   4.4,
+   36.5
+  ]
+ ],
+ "removed_from_original_mm3": 7.590450252598468,
+ "removed_bounds": [
+  [
+   -19.75,
+   -20.6,
+   -23.43
+  ],
+  [
+   19.74,
+   -19.6,
+   27.95
+  ]
+ ],
+ "added_mm3": 1048.754237549206,
+ "added_bounds": [
+  [
+   -19.75,
+   -29.6,
+   -26.85
+  ],
+  [
+   19.8,
+   -19.5,
+   28.35
+  ]
+ ],
+ "collision_urt2_pcb_mm3": 0.0,
+ "collision_imu_envelope_mm3": 0.0,
+ "urt2_x_range": [
+  -18.25,
+  18.25
+ ],
+ "urt2_z_range": [
+  -27.35,
+  28.85
+ ],
+ "imu_z_range": [
+  -34.0,
+  16.5
+ ],
+ "urt2_underside_y": -29.6,
+ "urt2_pcb_top_y": -31.200000000000003,
+ "depth_to_urt2_underside": 9.0,
+ "depth_to_urt2_top": 10.6,
+ "depth_beyond_old_boss_tips": 6.600000000000001,
+ "imu_clearance_to_urt2_mm": 2.5,
+ "urt_holes_xz": [
+  [
+   -14.6,
+   25.35
+  ],
+  [
+   14.6,
+   25.35
+  ],
+  [
+   -14.6,
+   -23.85
+  ],
+  [
+   14.6,
+   -23.85
+  ]
+ ],
+ "imu_holes_xz": [
+  [
+   -8.25,
+   14.0
+  ],
+  [
+   8.25,
+   14.0
+  ]
+ ],
+ "new_feature_max_abs_x": 17.6,
+ "cavity_side_untouched": true,
+ "pilot_depth_measured_urt": [
+  6.0,
+  6.0,
+  6.0,
+  6.0
+ ],
+ "pilot_depth_measured_imu": [
+  3.0,
+  3.0
+ ]
+}

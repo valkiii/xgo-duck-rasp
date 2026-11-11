@@ -1,0 +1,30 @@
+# XGO Duck Pi runtime settings.
+
+# Where fetch_upstream.sh put LuwuDynamics/xgoduck_runtime_arduino (relative to this file).
+upstream = "upstream"
+
+# Web control page port (same as the UNO Q app).
+http_port = 9527
+
+# Run the 100 Hz servo/IMU thread with real-time priority when allowed.
+realtime = true
+
+[servo_bus]
+# "auto" picks the first USB serial adapter (URT-2 shows up as /dev/ttyACM0 on the Pi).
+port = "auto"
+baud = 1000000
+# Whether the adapter echoes transmitted bytes: "auto" detects it at start-up, or true / false.
+echo = "auto"
+
+[imu]
+# "mpu6050" (GY-521 and similar) or "qmi8658" (the chip on the Luwu driver board).
+type = "mpu6050"
+i2c_bus = 1
+# MPU6050 with AD0 wired to 3.3 V -> 0x69 (0x68 is taken by the PiSugar 3 clock).
+address = "0x69"
+# Which sensor axis points along body x (forward), y (left), z (up).
+# "-z,-x,+y" = board flat on the robot's back, components facing out (backwards),
+# silkscreen Y arrow up, X arrow to the robot's right. Check with tools/imu_check.py.
+axes = "-z,-x,+y"
+# MPU6050 digital low-pass filter setting 0..6 (2 = ~94 Hz, ~3 ms delay).
+dlpf = 2

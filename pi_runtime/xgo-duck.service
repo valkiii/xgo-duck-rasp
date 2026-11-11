@@ -1,0 +1,15 @@
+[Unit]
+Description=XGO Duck runtime (web UI on port 9527)
+After=network.target
+
+[Service]
+User=@USER@
+WorkingDirectory=@DIR@
+ExecStart=@DIR@/.venv/bin/python @DIR@/run.py
+Restart=on-failure
+RestartSec=3
+# Lets the 100 Hz servo thread use SCHED_FIFO without running as root.
+LimitRTPRIO=50
+
+[Install]
+WantedBy=multi-user.target

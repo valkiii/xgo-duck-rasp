@@ -1,0 +1,125 @@
+{
+ "LiPo (PiSugar 3)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "PiSugar 3 PCB": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "PiSugar port + buttons": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "Pi Zero 2W": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "Pi connectors / header pins": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "Dupont jumpers (straight)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "FE-URT-2 PCB": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "FE-URT-2 connectors": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "MPU6050 IMU": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "IMU pins + Dupont housings": {
+  "carrier": 13.397999999999985,
+  "cover_hood": 0
+ },
+ "screws: boss M3 (x3)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "screws: URT-2 M3x8 (x4)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "screws: Pi M2.5x16 (x4)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "screws: IMU M2.5x5 (x2)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "screws: cover M3x16 (x2)": {
+  "carrier": 0,
+  "cover_hood": 0
+ },
+ "carrier_vs_cover": 0,
+ "hood_vs_cover": 0,
+ "battery": {
+  "carrier": 0,
+  "cover": 0,
+  "hood": 0,
+  "min_gap_carrier": 0.0,
+  "min_gap_cover": 0.75855867246489
+ },
+ "lipo_sink": {
+  "min_free": -3.8146972514141453e-07,
+  "frac_ge_3": 0.9207920792079208,
+  "frac_zero": 0.06870074762578299,
+  "x_range": [
+   12.25,
+   36.25
+  ],
+  "z_range": [
+   -28.1,
+   21.9
+  ],
+  "best_shift_min_free": [
+   -3.8146972514141453e-07,
+   -3.0,
+   -8.0
+  ]
+ },
+ "outer": [
+  78.3,
+  76.0
+ ],
+ "depth": {
+  "roof": 25.0,
+  "strip": 30.5,
+  "hood": 39.0
+ },
+ "watertight": {
+  "carrier": true,
+  "cover": true,
+  "hood": true
+ },
+ "mass_g": {
+  "carrier": 11.609973782494334,
+  "cover": 16.503334680236996,
+  "hood": 4.84611490067586,
+  "total": 32.95942336340719
+ },
+ "assembled_bounds_battery_frame": [
+  [
+   -37.150001525878906,
+   -63.599998474121094,
+   -37.5
+  ],
+  [
+   41.150001525878906,
+   -24.600000381469727,
+   38.5
+  ]
+ ],
+ "imu_battery_xz": [
+  -16.0,
+  4.5
+ ]
+}

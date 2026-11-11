@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.DS_Store
+pi_runtime/upstream/
+pi_runtime/wizard_state.json
+*.log
+# upstream clones (see cad/ref/README.md)
+cad/ref/xgoduck_rl/
+cad/ref/xgoduck_hardware/
