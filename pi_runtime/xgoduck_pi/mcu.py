@@ -41,6 +41,12 @@ SERVO_REPLY = struct.Struct('<4sBBBBHH')
 # duck_config.h
 NUM_MOTORS = 15
 SERVO_REPLY_US = 6000
+AUX_REPLY_US = 1500           # extra wait for one voltage/temperature read (reply is ~100 us)
+AUX_SWEEP_S = 1.0             # a sweep over all servos starts about once a second
+VOLT_VALID_RAW = (30, 300)    # 3.0 V .. 30 V in 0.1 V units; anything else is a garbled read
+VOLT_MAX_AGE_S = 5.0
+BATTERY_SUSTAIN_S = 3.0
+BATTERY_HYSTERESIS_V = 0.1
 M_N, M_A = 4095.0, 360.0
 SERVO_SPEED_UNIT = 50.0
 CAL_CENTER_POS = 2047
@@ -95,6 +101,7 @@ class Stats:
     bus_errors: int = 0
     bus_error: str = ''
     echo: bool = False
+    arm_refused_battery: int = 0
     pd_mask: int = 0
     boot_p: list = field(default_factory=lambda: [0] * NUM_MOTORS)
     boot_d: list = field(default_factory=lambda: [0] * NUM_MOTORS)
@@ -103,7 +110,8 @@ class Stats:
 class VirtualMCU:
     """Drop-in for the Arduino Bridge object the upstream Controller expects."""
 
-    def __init__(self, open_port, imu, *, echo='auto', realtime=False) -> None:
+    def __init__(self, open_port, imu, *, echo='auto', realtime=False,
+                 battery_warn_v=7.0, battery_cutoff_v=6.6) -> None:
         # open_port() -> a pyserial-like object; called again after a USB disconnect.
         self._open_port = open_port
         self.imu = imu
@@ -135,6 +143,20 @@ class VirtualMCU:
         self._read_id = None
         self._read_seen = False
         self._read_pos = 0
+        # Battery / temperature monitor: one small read per tick, see _poll_aux().
+        self.battery_warn_v = battery_warn_v
+        self.battery_cutoff_v = battery_cutoff_v
+        self.battery_low = False
+        self.servo_volts = {}     # id -> (volts, monotonic time)
+        self.servo_temps = {}     # id -> (deg C, monotonic time)
+        self._low_since = None
+        self._aux_id = None
+        self._aux_seen = False
+        self._aux_val = (0, 0)
+        self._aux_next = NUM_MOTORS
+        self._aux_sweep_at = 0.0
+        self._boot_reading = False
+        self._last_arm_warn = 0.0
         self._stop = threading.Event()
         self._threads = []
 
@@ -234,9 +256,15 @@ class VirtualMCU:
             self._ping_seen = True  # even an error status proves the address answered
             return
         idx = self._index.get(r.servo_id, -1)
-        if r.length == 4 and r.error == 0 and idx >= 0:
-            self.stats.boot_p[idx], self.stats.boot_d[idx] = r.params[0], r.params[1]
-            self.stats.pd_mask |= 1 << idx
+        if r.length == 4:
+            # Two-byte replies come from exactly two requests: the pending voltage/temperature
+            # read, or the one-off boot KP/KD sync read. Anything else is stale and ignored.
+            if r.error == 0 and self._aux_id is not None and r.servo_id == self._aux_id:
+                self._aux_val = (r.params[0], r.params[1])
+                self._aux_seen = True
+            elif r.error == 0 and self._boot_reading and idx >= 0:
+                self.stats.boot_p[idx], self.stats.boot_d[idx] = r.params[0], r.params[1]
+                self.stats.pd_mask |= 1 << idx
             return
         if r.length != 8 or r.error != 0:
             return
@@ -384,8 +412,65 @@ class VirtualMCU:
         bus.drain()
         bus.sync_read(MOTOR_IDS, scs.ADDR_TEMP_KP, 2)
         bus.flush()
-        bus.collect(0.020, self._handle_reply)
+        self._boot_reading = True
+        try:
+            bus.collect(0.020, self._handle_reply)
+        finally:
+            self._boot_reading = False
         return True
+
+    # ---- battery voltage and servo temperature ----------------------------
+    def bus_voltage(self):
+        # Median of the servo voltage readings from the last few seconds, or None.
+        now = time.monotonic()
+        vals = sorted(v for v, t in list(self.servo_volts.values()) if now - t <= VOLT_MAX_AGE_S)
+        return vals[len(vals) // 2] if vals else None
+
+    def servo_temp_max(self):
+        now = time.monotonic()
+        vals = [v for v, t in list(self.servo_temps.values()) if now - t <= 10 * VOLT_MAX_AGE_S]
+        return max(vals) if vals else None
+
+    def _poll_aux(self) -> None:
+        # At most one extra 2-byte read per tick: sweeps all servos about once a second.
+        now = time.monotonic()
+        if self._aux_next >= NUM_MOTORS:
+            if now < self._aux_sweep_at:
+                return
+            self._aux_next, self._aux_sweep_at = 0, now + AUX_SWEEP_S
+        servo_id = MOTOR_IDS[self._aux_next]
+        self._aux_next += 1
+        bus = self.bus
+        bus.drain()
+        self._aux_id, self._aux_seen = servo_id, False
+        bus.read(servo_id, scs.ADDR_VOLTAGE, scs.VOLT_TEMP_LEN)
+        bus.flush()
+        bus.collect(AUX_REPLY_US / 1e6, self._handle_reply, lambda: self._aux_seen)
+        self._aux_id = None
+        if self._aux_seen:
+            self._record_aux(servo_id, *self._aux_val)
+
+    def _record_aux(self, servo_id: int, volt_raw: int, temp_raw: int) -> None:
+        now = time.monotonic()
+        if VOLT_VALID_RAW[0] <= volt_raw <= VOLT_VALID_RAW[1]:
+            self.servo_volts[servo_id] = (volt_raw / 10.0, now)
+        if 0 < temp_raw <= 150:
+            self.servo_temps[servo_id] = (temp_raw, now)
+        v = self.bus_voltage()
+        if v is None:
+            return
+        if v < self.battery_cutoff_v:
+            if self._low_since is None:
+                self._low_since = now
+            elif now - self._low_since >= BATTERY_SUSTAIN_S and not self.battery_low:
+                self.battery_low = True
+                log.warning('battery %.1f V below cutoff %.1f V: new ARM commands are refused',
+                            v, self.battery_cutoff_v)
+        elif v >= self.battery_cutoff_v + BATTERY_HYSTERESIS_V:
+            self._low_since = None
+            if self.battery_low:
+                self.battery_low = False
+                log.info('battery back to %.1f V: ARM allowed again', v)
 
     def _bus_failed(self, exc) -> None:
         self.stats.bus_errors += 1
@@ -437,9 +522,11 @@ class VirtualMCU:
                 bad = self.stats.invalid_commands
 
             try:
+                if cal is not None and (bus is not None or cal[0] == CAL_SET_ZEROS):
+                    # CAL_SET_ZEROS only updates memory, so it must not be dropped while the
+                    # adapter is closed: the controller pushes it once, then adopts our zeros.
+                    self._apply_cal(cal)
                 if bus is not None:
-                    if cal is not None:
-                        self._apply_cal(cal)
                     if servo is not None:
                         self._apply_servo(servo)
                 elif servo is not None:
@@ -454,7 +541,13 @@ class VirtualMCU:
                         accepted_seq, have_command, last_command_us, ttl = cmd.seq, True, start, cmd.ttl_us
                         if cmd.mode == DISARM:
                             enabled = timed_out = False
-                        if (cmd.mode == ARM and not enabled and self.imu.ok and bus is not None
+                        if cmd.mode == ARM and not enabled and self.battery_low:
+                            self.stats.arm_refused_battery += 1
+                            if time.monotonic() - self._last_arm_warn > 5.0:
+                                self._last_arm_warn = time.monotonic()
+                                log.warning('ARM refused: battery %s V is below the %.1f V cutoff',
+                                            self.bus_voltage(), self.battery_cutoff_v)
+                        elif (cmd.mode == ARM and not enabled and self.imu.ok and bus is not None
                                 and elapsed(start, last_imu_us) < 50_000):
                             enabled, timed_out, last_healthy_us = True, False, start
                             bus.set_run_kp_kd()
@@ -493,6 +586,8 @@ class VirtualMCU:
                 if bus is not None:
                     full = (1 << NUM_MOTORS) - 1
                     self._wait_replies(lambda: self._rx_mask == full)
+                    if self._rx_mask == full:  # bus idle again; room for one small extra read
+                        self._poll_aux()
             except OSError as exc:  # serial.SerialException subclasses OSError: USB unplugged etc.
                 self._bus_failed(exc)
                 enabled = previous_enabled = False

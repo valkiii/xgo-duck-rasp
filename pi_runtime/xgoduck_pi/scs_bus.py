@@ -27,6 +27,12 @@ ADDR_TEMP_KD = 51
 ADDR_UNLOCK = 0x37
 ADDR_PRESENT = 0x38
 PRESENT_LEN = 6
+# Present voltage (0.1 V units) and present temperature (deg C) follow the 6-byte
+# position/speed/load block directly: SMS_STS_PRESENT_VOLTAGE = 62, _TEMPERATURE = 63 in
+# the Feetech SDK (same for SCSCL), i.e. one 2-byte read at 0x3E gives both.
+ADDR_VOLTAGE = 0x3E
+ADDR_TEMPERATURE = 0x3F
+VOLT_TEMP_LEN = 2
 TEMP_KP_RUN, TEMP_KD_RUN, TEMP_KP_MOUTH = 6, 20, 10
 MOUTH_MOTOR_ID = 34
 POS_MIN, POS_MAX = 0, 4095

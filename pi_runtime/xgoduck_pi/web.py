@@ -138,12 +138,22 @@ class Handler(BaseHTTPRequestHandler):
         self._api('POST')
 
 
+def _round(v, n):
+    return None if v is None else round(v, n)
+
+
 def pi_status(mcu) -> dict:
     s = mcu.stats
     imu = mcu.imu
     return dict(bus_connected=mcu.bus is not None, bus_error=s.bus_error, bus_errors=s.bus_errors,
                 adapter_echo=s.echo, imu_type=type(imu).__name__, imu_error=getattr(imu, 'last_error', ''),
-                tick_overruns=s.overruns, report_drops=s.report_drops)
+                tick_overruns=s.overruns, report_drops=s.report_drops,
+                bus_voltage=_round(mcu.bus_voltage(), 1), servo_temp_max=mcu.servo_temp_max(),
+                servo_temps={str(k): v for k, (v, _) in sorted(mcu.servo_temps.items())},
+                low_battery=mcu.battery_low,
+                battery_warn=(lambda v: v is not None and v < mcu.battery_warn_v)(mcu.bus_voltage()),
+                battery_warn_v=mcu.battery_warn_v, battery_cutoff_v=mcu.battery_cutoff_v,
+                arm_refused_battery=s.arm_refused_battery)
 
 
 def serve(server: Server) -> threading.Thread:

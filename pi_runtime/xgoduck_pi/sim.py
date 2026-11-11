@@ -26,6 +26,8 @@ class SimServo:
         self.lock = 1
         self.temp_kp, self.temp_kd = 32, 0
         self.perm_kp, self.perm_kd = 32, 0
+        self.volt_raw = 79        # 7.9 V in 0.1 V units (a charged 2S pack)
+        self.temp_c = 35
 
     def step(self, dt: float) -> None:
         if not self.torque:
@@ -43,6 +45,7 @@ class SimServo:
         regs = {scs.ADDR_PRESENT: pos & 0xFF, scs.ADDR_PRESENT + 1: pos >> 8,
                 scs.ADDR_PRESENT + 2: speed & 0xFF, scs.ADDR_PRESENT + 3: speed >> 8,
                 scs.ADDR_PRESENT + 4: 0, scs.ADDR_PRESENT + 5: 0,
+                scs.ADDR_VOLTAGE: self.volt_raw, scs.ADDR_TEMPERATURE: self.temp_c,
                 scs.ADDR_TEMP_KP: self.temp_kp, scs.ADDR_TEMP_KD: self.temp_kd,
                 scs.ADDR_ID: self.id, scs.ADDR_TORQUE: int(self.torque),
                 scs.ADDR_PERM_KP_KD: self.perm_kp, scs.ADDR_PERM_KP_KD + 1: self.perm_kd}
@@ -141,6 +144,10 @@ class SimSerial:
         self.is_open = False
 
     # bus emulation ---------------------------------------------------------
+    def set_voltage(self, volts: float) -> None:
+        for s in self.servos:
+            s.volt_raw = int(round(volts * 10))
+
     def find(self, servo_id: int):
         return next((s for s in self.servos if s.id == servo_id), None)
 
