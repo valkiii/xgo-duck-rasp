@@ -53,3 +53,47 @@ def test_bus_check_refuses_duplicate_ids(capsys):
     assert bus_check.setup(bus, 1, 10) == 1
     assert port.servos[0].id == 1
     assert 'already on the bus' in capsys.readouterr().out
+
+
+# ---- imu_check --bias ----------------------------------------------------------
+import imu_check  # noqa: E402
+
+
+class _RestingImu:
+    def __init__(self, gyro):
+        self.gyro = gyro
+
+    def read_sensor(self):
+        return [0, 1, 0], list(self.gyro)
+
+
+def test_measure_bias_averages_the_raw_gyro():
+    mean, std = imu_check.measure_bias(_RestingImu((0.5, -1.25, 2.0)), seconds=0.05, interval=0.001)
+    assert mean == [0.5, -1.25, 2.0] and std == [0.0, 0.0, 0.0]
+    assert imu_check.bias_line(mean) == 'gyro_bias = [0.500, -1.250, 2.000]'
+
+
+def test_write_bias_replaces_or_inserts_the_line(tmp_path):
+    cfg = tmp_path / 'config.toml'
+    cfg.write_text('[servo_bus]\nport = "auto"\n\n[imu]\ntype = "mpu6050"\ngyro_bias = [0.0, 0.0, 0.0]\n\n[battery]\nwarn_v = 7.0\n')
+    imu_check.write_bias(cfg, [0.1, -0.2, 0.3])
+    import tomllib
+    data = tomllib.loads(cfg.read_text())
+    assert data['imu']['gyro_bias'] == [0.1, -0.2, 0.3] and data['battery']['warn_v'] == 7.0
+    cfg.write_text('[imu]\ntype = "mpu6050"\n\n[battery]\nwarn_v = 7.0\n')
+    imu_check.write_bias(cfg, [1, 2, 3])
+    data = tomllib.loads(cfg.read_text())
+    assert data['imu']['gyro_bias'] == [1.0, 2.0, 3.0] and data['imu']['type'] == 'mpu6050'
+    cfg.write_text('[battery]\nwarn_v = 7.0\n')
+    import pytest
+    with pytest.raises(ValueError):
+        imu_check.write_bias(cfg, [0, 0, 0])
+
+
+def test_shipped_config_parses_with_new_keys():
+    import tomllib
+    from pathlib import Path
+    data = tomllib.loads((Path(__file__).resolve().parents[1] / 'config.toml').read_text())
+    assert data['imu']['gyro_bias'] == [0.0, 0.0, 0.0]
+    assert data['battery'] == {'warn_v': 7.0, 'cutoff_v': 6.6}
+    assert data['http_host'] == '0.0.0.0'

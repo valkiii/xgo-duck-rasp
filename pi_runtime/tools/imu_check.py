@@ -4,11 +4,13 @@
     python tools/imu_check.py            # guided: robot upright, then nose-down
     python tools/imu_check.py --live     # print body-frame gravity with the configured axes
     python tools/imu_check.py --sample   # one averaged reading as JSON (used by the setup wizard)
+    python tools/imu_check.py --bias     # ~5 s at rest: print the gyro_bias line (add --write to save it)
 
 Run it on the Pi with the IMU mounted in its final place on the robot.
 """
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -34,17 +36,52 @@ def average(imu, seconds=1.0):
     return [a / n for a in acc_sum]
 
 
+def measure_bias(imu, seconds=5.0, interval=0.01):
+    """Mean and standard deviation of the raw (uncorrected) sensor-frame gyro, deg/s."""
+    samples = []
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        samples.append(imu.read_sensor()[1])
+        time.sleep(interval)
+    if not samples:
+        raise ValueError('no samples')
+    n = len(samples)
+    mean = [sum(s[i] for s in samples) / n for i in range(3)]
+    std = [(sum((s[i] - mean[i]) ** 2 for s in samples) / n) ** 0.5 for i in range(3)]
+    return mean, std
+
+
+def bias_line(bias):
+    return 'gyro_bias = [' + ', '.join(f'{v:.3f}' for v in bias) + ']'
+
+
+def write_bias(path, bias):
+    """Set gyro_bias under [imu] in config.toml (replace the line, or add it to the section)."""
+    path = Path(path)
+    text = path.read_text()
+    line = bias_line(bias)
+    new, n = re.subn(r'(?m)^gyro_bias\s*=.*$', line, text, count=1)
+    if n == 0:
+        new, n = re.subn(r'(?m)^(\[imu\][^\n]*\n)', lambda m: m.group(1) + line + '\n', text, count=1)
+    if n == 0:
+        raise ValueError(f'no [imu] section in {path}')
+    path.write_text(new)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--config', default=str(ROOT / 'config.toml'))
     ap.add_argument('--live', action='store_true')
     ap.add_argument('--sample', action='store_true')
+    ap.add_argument('--bias', action='store_true', help='measure the gyro zero-rate offset at rest')
+    ap.add_argument('--write', action='store_true', help='with --bias: save the result into config.toml')
+    ap.add_argument('--seconds', type=float, default=5.0, help='with --bias: averaging time')
     args = ap.parse_args()
     cfg = tomllib.loads(Path(args.config).read_text()).get('imu', {})
     address = str(cfg.get('address', 'auto'))
     imu = make_imu(cfg.get('type', 'mpu6050'), bus_number=int(cfg.get('i2c_bus', 1)),
                    address=None if address == 'auto' else int(address, 0),
-                   axes=cfg.get('axes', '-z,-x,+y'), dlpf=int(cfg.get('dlpf', 2)))
+                   axes=cfg.get('axes', '-z,-x,+y'), dlpf=int(cfg.get('dlpf', 2)))  # raw gyro: no gyro_bias, so --bias measures the true offset
     if not imu.init():
         if args.sample:
             print(json.dumps({'error': f'IMU not found at 0x{imu.address:02x} on I2C bus {imu.bus_number}: '
@@ -60,6 +97,20 @@ def main():
                           'body_grav': [v / 16384 for v in imu.acc_raw], 'axes': cfg.get('axes', '-z,-x,+y')}))
         return 0
     print(f'{type(imu).__name__} found at 0x{imu.address:02x}')
+
+    if args.bias:
+        print(f'Keep the robot completely still for {args.seconds:.0f} s...')
+        mean, std = measure_bias(imu, args.seconds)
+        print('Mean gyro at rest (sensor frame, deg/s): ' + ', '.join(f'{v:+.3f}' for v in mean))
+        print('Standard deviation:                      ' + ', '.join(f'{v:.3f}' for v in std))
+        if max(std) > 1.0:
+            print('The sensor moved too much during the measurement (std > 1 deg/s); nothing saved. Try again.')
+            return 1
+        print(f'\nPaste under [imu] in config.toml:\n    {bias_line(mean)}')
+        if args.write:
+            write_bias(args.config, mean)
+            print(f'Written to {args.config}. Restart the service to apply it.')
+        return 0
 
     if args.live:
         print('Body frame: x forward, y left, z up. Upright should read grav ~ (0, 0, -1).')

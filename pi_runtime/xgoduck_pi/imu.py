@@ -61,6 +61,10 @@ def to_body(axes, acc_sensor: Sequence[float], gyro_sensor: Sequence[float],
     return acc, gyro
 
 
+class ImuLost(Exception):
+    """The sensor answers on I2C but is no longer running (e.g. reset by a power dip)."""
+
+
 class _I2CImu:
     """Common retry behaviour: probe again once a second while missing (as the firmware)."""
 
@@ -107,6 +111,11 @@ class _I2CImu:
             return False
         try:
             acc, gyro = self._sample()
+        except ImuLost as exc:
+            self.found = self.ok = False
+            self.last_error = str(exc)
+            self._last_probe = time.monotonic()  # re-init after the usual 1 s
+            return False
         except OSError as exc:
             self.ok = False
             self.last_error = str(exc)
@@ -129,13 +138,27 @@ class MPU6050(_I2CImu):
     WHO_AM_I_VALUES = {0x68, 0x69, 0x70, 0x71, 0x72, 0x73, 0x98}
     GYRO_LSB_PER_DPS = 32.8  # +-1000 deg/s range
 
+    PWR_MGMT_1 = 0x6B
+    SLEEP_BIT = 0x40
+    MIN_ACC_G = 0.3          # |a| this low for LOW_ACC_SAMPLES in a row = sensor not measuring
+    LOW_ACC_SAMPLES = 20
+
     def __init__(self, bus_number: int = 1, address: int = 0x69, axes: str = '-z,-x,+y',
-                 dlpf: int = 2) -> None:
+                 dlpf: int = 2, gyro_bias=(0.0, 0.0, 0.0)) -> None:
         super().__init__(bus_number, address, axes)
         self.dlpf = dlpf
         self.who_am_i = None
+        bias = [float(v) for v in gyro_bias]
+        if len(bias) != 3:
+            raise ValueError(f'gyro_bias needs three values (deg/s), got {gyro_bias!r}')
+        self.gyro_bias = bias
+        self.health_interval = 1.0
+        self._last_health = 0.0
+        self._low_acc = 0
 
     def _init(self) -> bool:
+        self._low_acc = 0
+        self._last_health = time.monotonic()
         who = self._read(0x75, 1)[0]
         self.who_am_i = who
         if who not in self.WHO_AM_I_VALUES:
@@ -165,8 +188,22 @@ class MPU6050(_I2CImu):
             return v - 0x10000 if v & 0x8000 else v
         return (s16(0), s16(2), s16(4)), (s16(8), s16(10), s16(12))
 
+    def _check_health(self, acc_s) -> None:
+        # After a power dip the chip resets into sleep and returns zeros without I2C errors.
+        mag = sum(v * v for v in acc_s) ** 0.5 / ACC_LSB_PER_G
+        self._low_acc = self._low_acc + 1 if mag < self.MIN_ACC_G else 0
+        if self._low_acc >= self.LOW_ACC_SAMPLES:
+            raise ImuLost(f'MPU6050 accelerometer reads {mag:.2f} g for {self._low_acc} samples (reset?)')
+        now = time.monotonic()
+        if now - self._last_health >= self.health_interval:
+            self._last_health = now
+            if self._read(self.PWR_MGMT_1, 1)[0] & self.SLEEP_BIT:
+                raise ImuLost('MPU6050 is asleep (PWR_MGMT_1 sleep bit set: power dip?)')
+
     def _sample(self):
         acc_s, gyro_s = self._raw()
+        self._check_health(acc_s)
+        gyro_s = [g - b * self.GYRO_LSB_PER_DPS for g, b in zip(gyro_s, self.gyro_bias)]
         return to_body(self.axes, acc_s, gyro_s, QMI_GYRO_LSB_PER_DPS / self.GYRO_LSB_PER_DPS)
 
 
@@ -247,5 +284,6 @@ def make_imu(kind: str, **kwargs):
         return MPU6050(**kwargs)
     if kind == 'qmi8658':
         kwargs.pop('dlpf', None)
+        kwargs.pop('gyro_bias', None)  # only the MPU6050 driver applies a bias
         return QMI8658(**kwargs)
     raise ValueError(f'unknown imu type {kind!r} (use mpu6050 or qmi8658)')
