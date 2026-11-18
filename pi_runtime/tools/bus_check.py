@@ -138,10 +138,12 @@ def hold(bus, ids, seconds, kp, kd, nudge):
 
 
 ZERO_FILE = ROOT / 'upstream' / 'data' / 'zero_pos.json'
+# upstream home pose (rl_core.DEFAULT_DEG): hips/ankles +-23, knees 0, hip roll +-5, neck and head pitch 20
+HOME_DEG = {10: 0, 11: -5, 12: -23, 13: 0, 14: 23, 20: 0, 21: 5, 22: 23, 23: 0, 24: -23, 30: 20, 31: 20, 32: 0, 33: 0}
 
 
-def to_zero(bus, ids, frac, seconds, hold_s, kp, kd):
-    """Ramp from the current pose to frac x the saved zeros, hold, ramp back, torque off."""
+def to_zero(bus, ids, frac, seconds, hold_s, kp, kd, pose_deg=None):
+    """Ramp from the current pose to frac x the saved zeros (or pose_deg, joint degrees), hold, ramp back, torque off."""
     import json
     zeros = dict(zip(ALL_IDS, json.loads(ZERO_FILE.read_text())['zero_pos']))
     start = {}
@@ -151,7 +153,9 @@ def to_zero(bus, ids, frac, seconds, hold_s, kp, kd):
             print(f'ID {servo_id} does not answer; nothing was enabled')
             return 1
         start[servo_id] = pos
-    target = {i: round(start[i] + frac * (zeros[i] - start[i])) for i in ids}
+    # controller convention: angle = -(raw - zero) * 360 / 4095, so raw = zero - angle * 4095 / 360
+    goal = {i: zeros[i] - (pose_deg or {}).get(i, 0) * 4095 / 360 for i in ids}
+    target = {i: round(start[i] + frac * (goal[i] - start[i])) for i in ids}
     print('  '.join(f'{i}: {start[i]}->{target[i]} ({(target[i] - start[i]) * 360 / 4096:+.0f} deg)' for i in ids))
     bus.set_temp_kp_kd(kp, kd)
     bus.sync_write_goals(list(start), list(start.values()))
@@ -200,6 +204,11 @@ def main():
     z.add_argument('--hold', type=float, default=5)
     z.add_argument('--kp', type=int, default=4)
     z.add_argument('--kd', type=int, default=20)
+    st = sub.add_parser('stand', help='slow scripted stand: ramp to the home pose, hold, sit back (service stopped)')
+    st.add_argument('--seconds', type=float, default=4, help='ramp time each way')
+    st.add_argument('--hold', type=float, default=8)
+    st.add_argument('--kp', type=int, default=6)
+    st.add_argument('--kd', type=int, default=20)
     args = ap.parse_args()
     bus = open_bus(args.port, args.baud)
     try:
@@ -215,6 +224,8 @@ def main():
                 print('--frac is 0-1')
                 return 1
             return to_zero(bus, args.ids or ALL_IDS[:10], args.frac, args.seconds, args.hold, args.kp, args.kd)
+        if args.cmd == 'stand':
+            return to_zero(bus, list(HOME_DEG), 1.0, args.seconds, args.hold, args.kp, args.kd, pose_deg=HOME_DEG)
         if not (0 <= args.new_id <= 253):
             print('IDs are 0-253')
             return 1
