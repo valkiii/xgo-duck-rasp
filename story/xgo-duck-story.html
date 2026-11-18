@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 /* Layout: engineering-notebook scrollytelling. Story column on the left, a sticky "bench"
-   on the right with the live 3D duck, joint read-outs and a clickable mini system map. */
+   on the right with the live 3D duck and a clickable story line (where you are, where the project is). */
 :root{
   --paper:#EDF0F3; --card:#F8F9FB; --ink:#18212B; --muted:#56626F; --rule:#CDD4DC; --grid:#DCE2E8;
   --pla-orange:#E25A17; --pla-yellow:#E9AE0B; --wire:#2B5FD9; --ok:#1F8A4C; --warn:#B9770E; --bad:#C23B2E;
@@ -206,6 +206,26 @@ label.ck{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:
 .steps li b{font-weight:600}
 .steps li span{font-size:15px; color:var(--muted)}
 
+/* story line beside the duck */
+.storyline{flex:none; max-height:46%; display:flex; flex-direction:column; background:var(--card); border:1px solid var(--rule); border-radius:14px; padding:8px 10px 6px}
+.sl-head{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:0 2px 6px}
+.sl-head span:last-child{text-transform:none; letter-spacing:0; display:flex; align-items:center; gap:5px}
+.sl-key{display:inline-block; width:9px; height:9px; border-radius:50%}
+.sl-key.read{background:var(--pla-orange)} .sl-key.proj{background:var(--card); border:2px solid var(--ok); margin-left:6px}
+#slList{list-style:none; margin:0; padding:0 2px 0 0; overflow-y:auto; position:relative; scrollbar-width:thin}
+.sl-ph{font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--ink); padding:6px 0 2px 26px; display:flex; gap:8px; align-items:baseline}
+.sl-ph b{color:var(--pla-orange); font-size:12px; min-width:18px}
+.sl-ch{position:relative}
+.sl-ch a{display:flex; align-items:center; gap:8px; padding:3px 6px 3px 26px; border-radius:6px; text-decoration:none; color:var(--muted); font-size:13px; line-height:1.3}
+.sl-ch a:hover{background:var(--paper); color:var(--ink)}
+.sl-ch::before{content:""; position:absolute; left:10px; top:0; bottom:0; width:2px; background:var(--rule)}
+.sl-ch.past::before,.sl-ch.here::before{background:var(--pla-orange)}
+.sl-ch a::before{content:""; position:absolute; left:6px; top:50%; width:10px; height:10px; margin-top:-5px; border-radius:50%; background:var(--card); border:2px solid var(--rule); box-sizing:border-box}
+.sl-ch.past a::before{background:var(--pla-orange); border-color:var(--pla-orange)}
+.sl-ch.here a{background:var(--orange-soft); color:var(--ink); font-weight:600}
+.sl-ch.here a::before{background:var(--pla-orange); border-color:var(--pla-orange); box-shadow:0 0 0 4px var(--orange-soft)}
+.sl-ch .proj{margin-left:auto; font-family:var(--font-mono); font-size:10px; color:var(--ok); border:1px solid var(--ok); border-radius:999px; padding:0 6px; white-space:nowrap; font-weight:600}
+
 /* master plan */
 .diagram.tall svg{min-width:640px}
 .pl-band{fill:var(--card); stroke:var(--rule); stroke-width:1}
@@ -259,7 +279,7 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
   .layout{display:flex; flex-direction:column; gap:0}
   .stage{order:-1; align-self:stretch; position:sticky; top:calc(var(--nav-h) + env(safe-area-inset-top,0px)); height:auto; margin-top:0; padding-block:8px; z-index:5; background:var(--paper); border-bottom:1px solid var(--rule)}
   .bench{height:34vh; flex:none; min-height:210px}
-  .minimap{display:none}
+  .storyline{display:none}
   .chips{grid-template-columns:repeat(8,minmax(0,1fr))}
   .stage.collapsed .bench,.stage.collapsed .chips{display:none}
   .stage-toggle{display:block; position:absolute; right:20px; top:16px; z-index:4; font-size:12px; padding:4px 10px}
@@ -397,7 +417,7 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
 
   <article class="chapter wide" id="map" data-duck="map">
     <h3><small>Click any block to jump there</small>The whole system on one page</h3>
-    <p>This map stays with you: a small copy sits under the duck and lights up the part you're reading about. Red lines carry power, blue lines carry data, and dashed boxes are planned.</p>
+    <p>Red lines carry power, blue lines carry data, and dashed boxes are planned.</p>
     <div class="diagram" id="archFull"></div>
     <div class="legend"><span><i style="border-color:var(--bad)"></i>power</span><span><i style="border-color:var(--wire)"></i>data</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>planned</span></div>
   </article>
@@ -886,9 +906,7 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
     <div class="bench-head"><div class="scene-tag" id="sceneTag"><b>Loading</b> the duck…</div><div class="hint">drag · scroll · hover</div></div>
     <div class="tip" id="tip" hidden></div>
   </div>
-  <div class="chips" id="chips"></div>
-  <div class="planstrip" id="planStrip" aria-label="Plan phases"></div>
-  <div class="minimap"><div class="lbl"><span>System map</span><span>click to jump</span></div><div id="archMini"></div></div>
+  <nav class="storyline" id="storyline" aria-label="Story line"><div class="sl-head"><span>Story line</span><span><i class="sl-key read"></i>reading <i class="sl-key proj"></i>project is here</span></div><ol id="slList"></ol></nav>
 </aside>
 </div>
 
@@ -1060,8 +1078,6 @@ function archSVG(mini){
   return s + '</svg>';
 }
 $('#archFull').innerHTML = archSVG(false);
-$('#archMini').innerHTML = archSVG(true);
-$('#archMini svg').style.minWidth = '0';
 document.querySelectorAll('.dg-node').forEach(g => {
   const go = () => document.getElementById(g.dataset.target)?.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
   g.addEventListener('click', go);
@@ -1141,14 +1157,28 @@ document.querySelectorAll('.pl-step').forEach(g => {
   g.addEventListener('click', () => jumpTo(g.dataset.target));
   g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jumpTo(g.dataset.target); } });
 });
-const STRIP_TARGET = {1:'print',2:'calibration',3:'ladder',4:'stand',5:'controller',6:'rl-workflow',7:'rl-skills'};
-const PHASE_OF_SECTION = {print:1,head:1,power:1,wiring:1,software:2,calibration:2,tests:2,ladder:3,imu:3,stand:4,controller:5,camera:5,
-  rl:6,'rl-obs':6,'rl-train':6,'rl-gap':6,'rl-workflow':6,'rl-risks':6,'rl-skills':7};
-$('#planStrip').innerHTML = PLAN.map(ph => `<button type="button" class="${ph.st}" data-n="${ph.n}" title="Phase ${ph.n}: ${ph.name} (${ph.st})"><b>${ph.n}</b>${ph.name}</button>`).join('');
-document.querySelectorAll('#planStrip button').forEach(b => b.addEventListener('click', () => jumpTo(STRIP_TARGET[b.dataset.n])));
-function markPlan(){
-  const n = PHASE_OF_SECTION[activeSection];
-  document.querySelectorAll('#planStrip button').forEach(b => b.classList.toggle('here', +b.dataset.n === n));
+/* --------------------------------------------------------- story line */
+const STORY = [
+  ['00', 'The idea', [['top','Start'],['idea','Inspiration'],['original','Original vs ours'],['plan','The master plan'],['map','System overview']]],
+  ['01', 'Build', [['print','Printing the body'],['head','A Pi in the head'],['power','Power'],['wiring','Cabling']]],
+  ['02', 'Calibrate', [['software','Software loops'],['calibration','Calibration poses'],['tests','Test lab']]],
+  ['03', 'Next', [['ladder','Finish calibration'],['imu','Harden the hardware'],['stand','First motion'],['controller','Xbox controller'],['camera','Camera']]],
+  ['04', 'Learn', [['rl','Simulation to servos'],['rl-obs','What the network sees'],['rl-train','How it was trained'],['rl-gap','Where our duck differs'],['rl-workflow','Our training run'],['rl-skills','Skills after walking'],['rl-risks','Risks'],['roadmap','Roadmap']]],
+  ['✕', 'Learned the hard way', [['mistakes','Mistakes and fixes']]],
+  ['≡', 'For builders', [['bom','Bill of materials']]]
+];
+const PROJECT_AT = 'tests';   // where the build itself is today (18 Nov): zeros taught, eye check open
+const STORY_ORDER = STORY.flatMap(g => g[2].map(c => c[0]));
+$('#slList').innerHTML = STORY.map(([n, name, chs]) => `<li class="sl-ph"><b>${n}</b>${name}</li>` +
+  chs.map(([id, t]) => `<li class="sl-ch" data-id="${id}"><a href="#${id}">${t}${id === PROJECT_AT ? '<span class="proj">project is here</span>' : ''}</a></li>`).join('')).join('');
+document.querySelectorAll('.sl-ch a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(a.parentElement.dataset.id); }));
+function markStory(){
+  const i = STORY_ORDER.indexOf(activeSection), list = $('#slList');
+  document.querySelectorAll('.sl-ch').forEach(li => {
+    const k = STORY_ORDER.indexOf(li.dataset.id);
+    li.classList.toggle('past', k < i); li.classList.toggle('here', k === i);
+    if (k === i) { const r = li.offsetTop - list.clientHeight / 2 + li.offsetHeight / 2; list.scrollTo({top: Math.max(0, r), behavior: reduceMotion ? 'auto' : 'smooth'}); }
+  });
 }
 
 /* --------------------------------------------------------- policy I/O diagram */
@@ -1206,15 +1236,6 @@ $('#stageToggle').addEventListener('click', () => {
 });
 try { if (localStorage.getItem('duck-collapsed')) $('#stageToggle').click(); } catch (e) {}
 
-/* --------------------------------------------------------- joint chips */
-const chipEls = {};
-IDS.forEach(id => {
-  const c = document.createElement('button'); c.type = 'button';
-  c.className = 'chip ' + (id < 20 ? 'leg-l' : id < 30 ? 'leg-r' : 'neck');
-  c.innerHTML = `${id}<span>–</span>`; c.title = `ID ${id} · ${LABEL[id]}`;
-  c.addEventListener('click', () => flashJoint(id));
-  $('#chips').appendChild(c); chipEls[id] = c;
-});
 
 /* --------------------------------------------------------- terminal */
 const term = $('#term');
@@ -1223,7 +1244,6 @@ function termLine(html){ const d = document.createElement('div'); d.innerHTML = 
 
 /* ================================================================ 3D */
 const bench = $('#bench'), tag = $('#sceneTag'), tip = $('#tip');
-let flashJoint = () => {};
 if (!window.THREE) { fallback('The 3D library could not load.'); return; }
 
 const renderer = (() => { try { return new THREE.WebGLRenderer({antialias:true, alpha:true}); } catch (e) { return null; } })();
@@ -1326,9 +1346,6 @@ function applyPose(){
   const box = new THREE.Box3().setFromObject(zup);
   zup.position.y = -box.min.y + 0.002;
 }
-function updateChips(){
-  IDS.forEach(id => { const v = id === 34 ? null : cur[id]; chipEls[id].querySelector('span').textContent = v == null ? 'beak' : (v >= 0 ? '+' : '') + v.toFixed(1) + '°'; });
-}
 function setEmissive(){
   allMeshes.forEach(m => {
     const hl = highlight.includes(m.userData.part) || hoverMesh === m;
@@ -1337,11 +1354,6 @@ function setEmissive(){
     m.material.emissiveIntensity = Math.max(e, glow * 0.35);
   });
 }
-flashJoint = id => {
-  if (!PART_OF_ID[id]) return;
-  highlight = [PART_OF_ID[id]]; chipEls[id].classList.add('on'); setEmissive();
-  setTimeout(() => { chipEls[id].classList.remove('on'); highlight = sceneHL; setEmissive(); }, 1400);
-};
 
 /* ---- gait (illustrative, not the policy) */
 function gait(t, speed, turn){
@@ -1487,7 +1499,7 @@ function enterScene(id){
   sceneHL = sc.hl ? HL[sc.hl] : []; highlight = sceneHL; setEmissive();
   controls.autoRotate = !!sc.spin && !reduceMotion && performance.now() - userTouched > 8000;
   if (sc.mode === 'getup') getupLoop();
-  markPlan();
+  markStory();
 }
 function getupLoop(){
   if (reduceMotion) { target = {...POSES.home}; mode = 'pose'; return; }
@@ -1599,7 +1611,6 @@ function frame(now){
     } else if (glowing) { glowing = false; setEmissive(); }
     if (!modeOpts.spin && controls.autoRotate) controls.autoRotate = false;
     applyPose(); controls.update(); renderer.render(scene, camera);
-    if (++frameNo % 6 === 0) updateChips();
   }
   requestAnimationFrame(frame);
 }
@@ -1626,7 +1637,7 @@ function fallback(msg){
 (window.DUCK_MODEL ? Promise.resolve(window.DUCK_MODEL) : fetch('assets/duck_model.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })).then(M => {
   const geoms = {}; Object.entries(M.meshes).forEach(([n, m]) => geoms[n] = makeGeom(m));
   build(M.root, zup, geoms);
-  applyPose(); updateChips(); fitCamera();
+  applyPose(); fitCamera();
   new ResizeObserver(fitCamera).observe(bench);
   const h = location.hash.slice(1); if (h && document.getElementById(h)) document.getElementById(h).scrollIntoView();
   track(); requestAnimationFrame(frame);
