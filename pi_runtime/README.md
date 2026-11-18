@@ -80,6 +80,21 @@ It boots in **inference only**, with torque off. From there, follow upstream's R
 
 Closing the page turns torque off after 1 s.
 
+## Calibration without jumps
+
+Entering the upstream Calibration page turns torque on and drives every servo to raw 2047 at once, so a joint far from centre swings hard. These tools avoid that:
+
+```
+../.venv/bin/python tools/teach_zero.py          # on the Mac: torque off, hand-pose the zero pose, Enter
+sudo systemctl stop xgo-duck                       # on the Pi, before the two bus_check commands below
+.venv/bin/python tools/bus_check.py hold --nudge 45     # torque on where each servo already is, then 4 deg out and back per joint
+.venv/bin/python tools/bus_check.py zero --frac 0.5     # ramp the legs half way to the saved zeros, hold, ramp back
+sudo systemctl start xgo-duck
+```
+
+- `teach_zero.py` averages the encoders for 1.5 s, warns about joints that moved or sit within 300 counts of the 0/4095 wrap, writes `upstream/data/zero_pos.json` on the Pi (the old file is kept as `.bak`), restarts the service and checks that `/api/status` reports the new zeros. The zero pose is the MJCF qpos 0 (legs straight down, feet flat, neck vertical, head level, beak closed), not the sitting pose.
+- `hold` and `zero` write goal = present before enabling torque on each ID, use KP 4 by default, and always end with torque off. `zero` defaults to both legs; pass IDs to test single joints and `--kp` to compare stiffness.
+
 `/api/status` has an extra `pi` block with bus connection, adapter echo and IMU errors, plus: `bus_voltage` (V, or null), `servo_temps` (per ID, deg C), `servo_temp_max`, `low_battery`, `battery_warn`, `battery_warn_v`, `battery_cutoff_v`, `arm_refused_battery`.
 
 ## Battery and temperature
