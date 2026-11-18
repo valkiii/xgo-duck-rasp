@@ -37,3 +37,7 @@ print('--- single joints (left foot x fwd, z up, mm)')
 for jid in (12,13,14,11,10,30,31):
     for a in (30,-30):
         o=run({jid:a, jid+10 if jid<20 else jid:0}); print(jid,a,np.round(o['ankle_left']*1000).astype(int).tolist(), 'jaw',np.round(o['jaw_soft']*1000).astype(int).tolist())
+print('--- head (jaw tip, x fwd y left z up, mm)')
+for jid in (30,31,32):
+    for a in (0,30,-30):
+        o=run({**dict(zip([10,11,12,13,14,20,21,22,23,24,30,31],[0,-5,-23,0,23,0,5,23,0,-23,20,20])), jid:(20 if jid in (30,31) else 0)+a}); print(jid,a,np.round(o['jaw_soft']*1000).astype(int).tolist())
