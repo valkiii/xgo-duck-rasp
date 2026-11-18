@@ -1322,7 +1322,14 @@ function measure(){
   BLK = [...document.querySelectorAll(BLOCK_SEL)].filter(el => !el.parentElement.closest(BLOCK_SEL) && el.offsetHeight)
     .map(el => { const p = docPos(el); return {el, x: p.x, y: p.y, w: el.offsetWidth, h: el.offsetHeight, o: 0, v: 0, on: false}; });
   if (peckWord) { peckWord.letters = peckWord.letters.map(L => letterOf(L.el)); LET.push(...peckWord.letters); }
+  // chapter geometry in document coordinates, so scrolling never has to read the layout
+  SEC = [...document.querySelectorAll('[data-duck]')].map(el => {
+    const p = docPos(el), h = el.querySelector('h1, h3, h2'), hp = h ? docPos(h) : p;
+    return {id: el.id, el, x: p.x, y: p.y, w: el.offsetWidth, hx: hp.x + Math.min(h ? h.offsetWidth : 0, 420) / 2, hy: hp.y + (h ? h.offsetHeight / 2 : 0)};
+  });
+  SECBY = Object.fromEntries(SEC.map(c => [c.id, c]));
 }
+let SEC = [], SECBY = {};
 let measureTimer = 0;
 const remeasure = () => { clearTimeout(measureTimer); measureTimer = setTimeout(measure, 180); };
 addEventListener('resize', remeasure);
@@ -1425,11 +1432,10 @@ function wordPlay(now, beak){
 function gazeTarget(){
   const now = performance.now();
   if (now - ptr.t < 2500) return {x: ptr.x, y: ptr.y};
-  if (peckWord && peckWord.span.isConnected) { const r = peckWord.span.getBoundingClientRect(); return {x: r.left + r.width / 2, y: r.top + r.height / 2}; }
-  const sec = document.getElementById(activeSection || 'top'); const h = sec && (sec.querySelector('h1, h3, h2') || sec);
-  if (!h) return null; const r = h.getBoundingClientRect();
-  if (r.bottom < 0 || r.top > innerHeight) return null;
-  return {x: r.left + Math.min(r.width, 420) / 2, y: r.top + r.height / 2};
+  if (peckWord && peckWord.letters.length) { const a = peckWord.letters[0], b = peckWord.letters[peckWord.letters.length - 1]; return {x: (a.x + b.x) / 2 - scrollX, y: a.y - scrollY}; }
+  const c = SECBY[activeSection || 'top']; if (!c) return null;
+  const y = c.hy - scrollY; if (y < 0 || y > innerHeight) return null;
+  return {x: c.hx - scrollX, y};
 }
 
 /* --------------------------------------------------------- dock magnification */
@@ -1500,8 +1506,10 @@ themeGrid();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeGrid);
 new MutationObserver(themeGrid).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
 
+let canvasRect = {left: 0, top: 0, width: 1, height: 1};
 function resize(){
   const r = bench.getBoundingClientRect(); if (!r.width || !r.height) return;
+  canvasRect = {left: r.left, top: r.top, width: r.width, height: r.height};
   renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(bench); resize();
@@ -1559,7 +1567,7 @@ const lastBox = new THREE.Box3();
 function applyPose(){
   IDS.forEach(id => { const j = joints[id]; if (j) j.g.quaternion.setFromAxisAngle(j.axis, THREE.MathUtils.degToRad(cur[id])); });
   bodies.forEach(b => { if (b.node !== trunkNode) b.node.position.copy(b.base).multiplyScalar(1 + explode * 1.25); });
-  if (trunkNode) trunkNode.quaternion.copy(trunkBaseQ).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), THREE.MathUtils.degToRad(rootPitch)));
+  if (trunkNode) trunkNode.quaternion.copy(trunkBaseQ).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), THREE.MathUtils.degToRad(rootPitch + lean)));
   world.rotation.y = heading;
   zup.position.y = 0; world.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(zup);
@@ -1747,12 +1755,28 @@ sections.forEach((sec, i) => {
 });
 document.querySelector('#story footer')?.classList.add('txt-l');
 let duckSide = 'l', filmX = .44, hop = null, hopY = 0;
-const filmFor = side => side === 'l' ? .44 : -.5;          // NDC x of the duck: right of the text, or left of it
+const filmFor = side => side === 'l' ? .44 : -.5;          // first guess only; centreDuck() measures the real free space
+let lean = 0, scrollVel = 0, lastScrollY = scrollY, lastScrollT = performance.now(), lastDuckR = null;
+addEventListener('scroll', () => {
+  const now = performance.now(), dtS = Math.max(8, now - lastScrollT);
+  scrollVel = scrollVel * .6 + (scrollY - lastScrollY) / dtS * 1000 * .4; lastScrollY = scrollY; lastScrollT = now;
+}, {passive: true});
+// Centre of the empty strip beside the active chapter: between the text and the dock, or between the edge and the text.
+function freeCentre(){
+  const c = SECBY[activeSection || 'top']; if (!c) return null;
+  const col = {left: c.x - scrollX, right: c.x + c.w - scrollX}, dockL = storyRect().left, W = canvasRect.width;
+  return duckSide === 'l' ? (Math.min(W, col.right + 24) + Math.max(col.right + 40, dockL - 12)) / 2 : (16 + Math.max(40, col.left - 24)) / 2;
+}
+let _storyRect = null; const storyRect = () => _storyRect || (_storyRect = $('#storyline').getBoundingClientRect());
+addEventListener('resize', () => { _storyRect = null; });
 function setSide(id){
   const side = SIDE[id] || 'l'; if (!WIDE.matches || side === duckSide) return;
   const prev = duckSide; duckSide = side;
-  hop = reduceMotion ? null : {t0: performance.now(), from: filmX, to: filmFor(side), h0: heading, dir: side === 'l' ? 1 : -1};
-  if (reduceMotion) filmX = filmFor(side);
+  let to = filmFor(side);
+  const fc = freeCentre();
+  if (fc != null && lastDuckR) to = filmX + (fc - (lastDuckR.l + lastDuckR.r) / 2) / (canvasRect.width / 2);   // film offset shifts the image linearly
+  hop = reduceMotion ? null : {t0: performance.now(), from: filmX, to, h0: heading, dir: side === 'l' ? 1 : -1};
+  if (reduceMotion) filmX = to;
   const now = document.getElementById(id), was = sections.find(s2 => s2.id !== id && SIDE[s2.id] === prev && s2.getBoundingClientRect().bottom > 0 && s2.getBoundingClientRect().top < innerHeight);
   const push = (el, cls, d, o) => { if (!el || reduceMotion) return; el.style.setProperty('--d', d); el.style.setProperty('--o', o); el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), 1000); };
   push(now, 'arrive', side === 'l' ? -1 : 1, side === 'l' ? 'left' : 'right');
@@ -1764,8 +1788,9 @@ WIDE.addEventListener('change', () => { filmX = WIDE.matches ? filmFor(duckSide)
 const navLinks = [...document.querySelectorAll('.nav a.ph')];
 const PHASE_OF = {plan:9,ladder:3,'rl-obs':4,'rl-train':4,'rl-gap':4,'rl-workflow':4,'rl-skills':4,'rl-risks':4,top:-1,idea:0,original:0,map:7,print:1,head:1,power:1,wiring:1,software:2,calibration:2,tests:2,imu:3,stand:3,controller:3,camera:3,rl:4,roadmap:4,mistakes:5,bom:6};
 function track(){
-  const line = innerHeight * 0.42; let act = sections[0];
-  for (const s of sections) { if (s.getBoundingClientRect().top < line) act = s; }
+  let act = sections[0];
+  if (SEC.length) { const line = scrollY + innerHeight * 0.42; for (const c of SEC) if (c.y < line) act = c.el; }
+  else { const line = innerHeight * 0.42; for (const s of sections) { if (s.getBoundingClientRect().top < line) act = s; } }
   if (act.id === activeSection) return;
   activeSection = act.id; setSide(act.id); enterScene(act.dataset.duck);
   navLinks.forEach(a => a.setAttribute('aria-current', String(+a.dataset.phase === PHASE_OF[act.id])));
@@ -1831,7 +1856,7 @@ renderer.domElement.addEventListener('pointerleave', () => { tip.hidden = true; 
 let last = performance.now(), t = 0, frameNo = 0, glowing = false, landKick = false;
 const _bk = new THREE.Vector3(), _corner = new THREE.Vector3();
 function toScreen(v){
-  const r = renderer.domElement.getBoundingClientRect(); v.project(camera);
+  const r = canvasRect; v.project(camera);
   return {x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height};
 }
 function screenRect(){
@@ -1896,6 +1921,13 @@ function frame(now){
       if (k >= 1) { hop = null; hopY = 0; heading = 0; landKick = true; }
       placeTag();
     }
+    if (WIDE.matches && !hop && lastDuckR) {
+      const fc = freeCentre();
+      if (fc != null) filmX += (fc - (lastDuckR.l + lastDuckR.r) / 2) / (canvasRect.width / 2) * Math.min(1, dt * 5);
+      placeTag();
+    }
+    scrollVel *= Math.pow(.02, dt);                                     // decays within about a second
+    lean += (THREE.MathUtils.clamp(-scrollVel * .006, -9, 9) - lean) * Math.min(1, dt * 6);
     const fo = WIDE.matches ? -filmX * camera.getFilmWidth() / 2 : 0;
     if (camera.filmOffset !== fo) { camera.filmOffset = fo; camera.updateProjectionMatrix(); }
     explode += (explodeTarget - explode) * Math.min(1, dt * 3);
@@ -1908,7 +1940,7 @@ function frame(now){
     applyPose(); controls.update();
     ground.position.x = 0; ground.scale.setScalar(1 - Math.min(.6, hopY * .45));
     renderer.render(scene, camera);
-    const duckR = screenRect(), beak = joints[33] ? toScreen(joints[33].g.getWorldPosition(_bk)) : null;
+    const duckR = screenRect(); lastDuckR = duckR; const beak = joints[33] ? toScreen(joints[33].g.getWorldPosition(_bk)) : null;
     if (landKick && duckR) { landKick = false; kick((duckR.l + duckR.r) / 2 + scrollX, duckR.t + (duckR.b - duckR.t) * .35 + scrollY, 420, 520); rippleHeading(activeSection); }
     wordPlay(now, beak); playWords(dt, duckR);
   }
