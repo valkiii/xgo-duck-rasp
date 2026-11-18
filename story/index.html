@@ -140,7 +140,8 @@ figcaption{font-size:13px; color:var(--muted)}
 .compare tbody th{font-weight:600; white-space:nowrap}
 .compare td.ours{background:var(--orange-soft)}
 .compare tr:last-child td,.compare tr:last-child th{border-bottom:0}
-.compare td.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+.compare td.num{font-family:var(--font-mono); font-size:13px; font-variant-numeric:tabular-nums}
+.bom td.num{white-space:nowrap}
 
 /* timeline of mistakes */
 .timeline{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; position:relative}
@@ -197,6 +198,52 @@ label.ck{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:
 .steps li b{font-weight:600}
 .steps li span{font-size:15px; color:var(--muted)}
 
+/* master plan */
+.diagram.tall svg{min-width:640px}
+.pl-band{fill:var(--card); stroke:var(--rule); stroke-width:1}
+.pl-band.now{fill:var(--orange-soft); stroke:var(--pla-orange)}
+.pl-step{cursor:pointer}
+.pl-step rect{stroke-width:1.6}
+.pl-step:hover rect,.pl-step:focus rect{stroke-width:3}
+.st-done rect{fill:var(--ok-soft); stroke:var(--ok)} .st-now rect{fill:var(--orange-soft); stroke:var(--pla-orange)}
+.st-next rect{fill:var(--wire-soft); stroke:var(--wire)} .st-later rect{fill:var(--paper); stroke:var(--muted); stroke-dasharray:5 4}
+.pl-gate polygon{stroke-width:1.6}
+.gate-done polygon{fill:var(--ok-soft); stroke:var(--ok)} .gate-open polygon{fill:var(--yellow-soft); stroke:var(--pla-yellow)}
+.pl-ph{fill:var(--ink); font-family:var(--font-display); font-weight:800; font-size:22px}
+.pl-pt{fill:var(--ink); font-family:var(--font-body); font-weight:600; font-size:14px}
+.pl-ps{fill:var(--muted); font-family:var(--font-mono); font-size:10.5px}
+.pl-arrow{fill:none; stroke:var(--ink); stroke-width:1.6}
+.pl-arrow.fail{stroke:var(--bad); stroke-dasharray:6 4}
+.planstrip{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px}
+.planstrip button{font:inherit; font-family:var(--font-mono); font-size:10.5px; line-height:1.25; border:1px solid var(--rule); background:var(--card); color:var(--muted); border-radius:6px; padding:4px 2px; cursor:pointer; text-align:center}
+.planstrip button b{display:block; font-family:var(--font-display); font-size:15px; color:var(--ink)}
+.planstrip button.done{border-bottom:3px solid var(--ok)} .planstrip button.now{border-bottom:3px solid var(--pla-orange)}
+.planstrip button.next{border-bottom:3px solid var(--wire)} .planstrip button.later{border-bottom:3px dashed var(--muted)}
+.planstrip button.here{background:var(--ink); color:var(--card)} .planstrip button.here b{color:var(--pla-yellow)}
+
+/* validation ladder */
+.ladder{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px}
+.rung{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:10px; scroll-margin-top:calc(var(--nav-h) + 16px)}
+.rung-head{display:flex; flex-wrap:wrap; gap:6px 10px; align-items:baseline}
+.rung-head .n{font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--pla-orange); min-width:34px}
+.rung-head h4{margin:0; font-size:17px; flex:1; min-width:200px}
+.rung-head .eta{font-family:var(--font-mono); font-size:11px; color:var(--muted)}
+.rung-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+.rung-grid > div{background:var(--paper); border-radius:8px; padding:8px 10px; font-size:14px; min-width:0}
+.rung-grid > div > b{display:block; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:2px}
+.rung-grid code{font-size:12px; overflow-wrap:anywhere}
+.rung-grid .pass{border-left:3px solid var(--ok)} .rung-grid .fail{border-left:3px solid var(--bad)}
+.group-title{display:flex; gap:10px; align-items:baseline; margin-top:10px}
+.group-title h3{font-size:22px}
+
+/* RL */
+.kv{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px}
+.kv div{background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:8px 10px}
+.kv b{display:block; font-family:var(--font-display); font-size:22px; font-variant-numeric:tabular-nums}
+.kv span{font-size:13px; color:var(--muted)}
+.risk-h{color:var(--bad); font-weight:600} .risk-m{color:var(--warn); font-weight:600} .risk-l{color:var(--ok); font-weight:600}
+.cmd{font-family:var(--font-mono); font-size:12.5px; background:#0E141A; color:#C9D4DE; border-radius:8px; padding:10px 12px; overflow-x:auto; white-space:pre}
+
 footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:var(--muted); display:flex; flex-direction:column; gap:8px}
 
 /* ---------- responsive ---------- */
@@ -224,6 +271,7 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
   .tl .dot{grid-row:1 / span 3; grid-column:1}
   .tl > div{grid-column:2}
   .phase-num{font-size:48px}
+  .rung-grid{grid-template-columns:minmax(0,1fr)}
   .hint{display:none}
 }
 </style>
@@ -232,9 +280,10 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
   <a class="brand" href="#top"><i></i>XGO-Duck <span style="color:var(--pla-orange)">π</span></a>
   <ol id="navlist">
     <li><a class="ph" href="#idea" data-phase="0"><b>00</b>Idea</a></li>
+    <li><a class="ph" href="#plan" data-phase="9"><b>▶</b>Plan</a></li>
     <li><a class="ph" href="#print" data-phase="1"><b>01</b>Build</a></li>
     <li><a class="ph" href="#software" data-phase="2"><b>02</b>Calibrate</a></li>
-    <li><a class="ph" href="#imu" data-phase="3"><b>03</b>Next</a></li>
+    <li><a class="ph" href="#ladder" data-phase="3"><b>03</b>Next</a></li>
     <li><a class="ph" href="#rl" data-phase="4"><b>04</b>Learn</a></li>
     <li><a class="ph" href="#mistakes" data-phase="5"><b>✕</b>Mistakes</a></li>
     <li><a class="ph" href="#bom" data-phase="6"><b>≡</b>Parts</a></li>
@@ -329,6 +378,13 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
         </tbody>
       </table>
     </div>
+  </article>
+
+  <article class="chapter wide" id="plan" data-duck="plan">
+    <h3><small>Seven phases · five go/no-go gates · click any step</small>The master plan</h3>
+    <p>The project runs as a ladder of phases. Each phase ends at a gate: a measurable check that has to pass before the next phase is allowed to move the robot more. Green is done, orange is where we are now, blue is next, and dashed is later. Phase 5 can run alongside phase 4. If the duck can't walk with the original policy at gate 4, phase 6 retrains it for our heavier, Pi-headed duck.</p>
+    <div class="diagram tall" id="planDiagram"></div>
+    <div class="legend"><span><i style="border-color:var(--ok)"></i>done</span><span><i style="border-color:var(--pla-orange)"></i>now</span><span><i style="border-color:var(--wire)"></i>next</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>later</span><span>◆ gate with its pass criterion</span><span><i style="border-color:var(--bad);border-top-style:dashed"></i>if the gate fails</span></div>
   </article>
 
   <article class="chapter wide" id="map" data-duck="map">
@@ -469,33 +525,114 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
 
 <!-- ================= PHASE 3 ================= -->
 <section class="phase" aria-labelledby="p3">
-  <header class="phase-head"><span class="phase-num">03</span><span class="eyebrow">Phase 3 · next</span><h2 id="p3">Standing, steering and seeing</h2></header>
+  <header class="phase-head"><span class="phase-num">03</span><span class="eyebrow">Phase 3 · after calibration</span><h2 id="p3">The validation ladder</h2></header>
 
-  <article class="chapter" id="imu" data-duck="imu">
-    <h3><small>Which way is down?</small>The IMU</h3>
-    <p>The policy feels gravity through the IMU. If the axes are mounted the wrong way round, it thinks it's falling while standing still. Next steps:</p>
-    <ol class="steps">
-      <li><div><b>Print and mount</b><span>Print <code>battery_urt2.stl</code> and screw the MPU6050 flat on its two posts under the URT-2.</span></div></li>
-      <li><div><b>Two-pose axis check</b><span><code>imu_check.py</code>: hold the duck upright, then nose-down. It works out the mounting axes for <code>config.toml</code>.</span></div></li>
-      <li><div><b>Gyro bias</b><span>Average 5 s at rest. We saw about 2.4 °/s offset on the x axis on the bench. <code>--bias --write</code> subtracts it.</span></div></li>
-      <li><div><b>Deploy the 11 November safety update</b><span>Low-battery cutoff (6.6 V for 3 s), battery and temperature readout, IMU dropout recovery.</span></div></li>
+  <article class="chapter wide" id="ladder" data-duck="ladder">
+    <p>Once the zeros are taught, it's tempting to press "walk". Every rung below removes one way the first walk could go wrong, and each one says how we'll know it passed. Most take minutes. The order matters: a wrong joint direction or a sideways IMU makes the trained network fight the robot, and that ends in a fall that looks like a "bad policy".</p>
+    <div class="group-title"><span class="pill now">gate 2</span><h3>A · Finish the calibration</h3></div>
+    <ol class="ladder">
+      <li class="rung"><div class="rung-head"><span class="n">1</span><h4>Confirm the leg zeros by eye</h4><span class="pill now">open</span><span class="eta">10 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>The policy was trained to tolerate only ±0.015 rad (±0.86°) of encoder offset per joint. Today's hand-held check read the hips at about 24°. Either the hands bent the legs, or the zeros are off by that much.</div>
+          <div><b>How</b>Hold the duck in the air and run <code>bus_check.py zero --hold 15</code>, then look from the side and photograph it. Replay F in the test lab shows what the software thinks "straight" looks like.</div>
+          <div class="pass"><b>Pass when</b>Hip, knee and ankle sit in one vertical line, feet are flat and the legs are parallel. The joints read within 1° of zero.</div>
+          <div class="fail"><b>If it fails</b>Teach again with torque helping: a <code>teach_zero.py --assist</code> mode (to build) holds the current zeros at KP 4 while you nudge each joint, then records.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">2</span><h4>Neck, head and beak zeros (30 to 34)</h4><span class="pill next">next</span><span class="eta">15 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>Neck and head make up a third of the mass. A neck zero that's off tilts the whole centre of mass, and the policy reads the head channels relative to these zeros.</div>
+          <div><b>How</b>Duck upright with the head supported. Run <code>bus_check.py zero 30 31 32 33 --frac 0.5</code>, then the full run. Check that the beak (34) closes at 0° and opens to 30° in the web page once armed.</div>
+          <div class="pass"><b>Pass when</b>The neck is vertical, the head is level and facing forward, and the beak is closed. Each joint is within 1°.</div>
+          <div class="fail"><b>If it fails</b>Re-teach only those IDs. <code>teach_zero.py</code> writes all 15, so run it with the legs already in their correct zero pose.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">3</span><h4>Joint directions match the model</h4><span class="pill next">next</span><span class="eta">20 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>A mirrored joint is the classic sim-to-real killer. The network pushes the knee "forward" and the real knee goes back. The port assumes the same sign (−1) for every servo, like the original firmware.</div>
+          <div><b>How</b>From the home pose, move each joint +10° and compare with this page. Test B in the lab with "exaggerate ×4" turned on shows the direction the model expects for each ID.</div>
+          <div class="pass"><b>Pass when</b>All 14 joints turn the same way as the 3D duck.</div>
+          <div class="fail"><b>If it fails</b>Flip that ID's entry in <code>MOTOR_SIGN</code> in <code>mcu.py</code>, then teach the zeros again.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">4</span><h4>Back up the calibration</h4><span class="pill next">next</span><span class="eta">1 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>The first calibration was lost. The SD card lives in the head and is easy to reflash by mistake.</div>
+          <div><b>How</b>Run <code>pi_runtime/backup_calibration.sh</code> on the Mac. It copies <code>zero_pos.json</code> into the repo, so it ends up in git.</div>
+          <div class="pass"><b>Pass when</b>A dated copy is in git.</div>
+          <div class="fail"><b>If it fails</b>Copy it by hand with <code>scp</code>.</div>
+        </div></li>
     </ol>
   </article>
 
-  <article class="chapter" id="stand" data-duck="stand">
-    <h3><small>Hands around it</small>First stand, first steps</h3>
-    <ol class="steps">
-      <li><div><b>Default pose in the air</b><span>Pose it close to the home pose first, then press "Default pose": the jump stays small.</span></div></li>
-      <li><div><b>Supported stand on the table</b><span>Hands around it. Watch the battery and servo temperatures in the status page.</span></div></li>
-      <li><div><b>Walk policy at low speed</b><span>Forward speed 0.1 first. The head is about 23 g heavier than in the model, so watch for tipping forward.</span></div></li>
-      <li><div><b>Get-up, pick, roulade</b><span>Only after walking is stable.</span></div></li>
+  <article class="chapter wide" id="imu" data-duck="imu">
+    <div class="group-title"><span class="pill next">gate 3</span><h3>B · Harden the hardware</h3></div>
+    <ol class="ladder" start="5">
+      <li class="rung"><div class="rung-head"><span class="n">5</span><h4>Deploy the safety update</h4><span class="pill next">next</span><span class="eta">5 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>The 11 November changes never reached the Pi: the low-battery cutoff, battery and temperature readout, IMU dropout recovery, and zeros that survive with the adapter closed.</div>
+          <div><b>How</b><code>./deploy.sh valkiii_zero@192.168.2.87</code>, then <code>sudo systemctl restart xgo-duck</code>. Read <code>/api/status</code> → <code>pi</code>.</div>
+          <div class="pass"><b>Pass when</b><code>bus_voltage</code> reads 7.4 to 8.4 V, all 15 <code>servo_temps</code> look plausible, and arming is refused below 6.6 V for 3 s.</div>
+          <div class="fail"><b>If it fails</b>The register addresses come from the Feetech SDK. Read 0x3E/0x3F on one servo with <code>bus_check.py</code> and compare.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">6</span><h4>Mount the IMU, find its axes and bias</h4><span class="pill next">next</span><span class="eta">print + 30 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>The policy steers by the gravity direction and the body's rotation speed. It was trained with up to 6° of mounting error and ±0.03 rad/s of gyro noise. Our MPU6050 showed about 2.4°/s (0.042 rad/s) of bias at rest, which is more than that noise.</div>
+          <div><b>How</b>Print <code>battery_urt2.stl</code> and mount the MPU6050 flat (M2.5 × 4, pins down). Run <code>imu_check.py</code> upright and then nose-down to get the axes for <code>config.toml</code>. Then <code>imu_check.py --bias --write</code>.</div>
+          <div class="pass"><b>Pass when</b>The gravity vector in <code>/api/status</code> is right within 2° in six poses (upright, nose down, nose up, both sides, on its back), and the gyro reads under 0.01 rad/s at rest.</div>
+          <div class="fail"><b>If it fails</b>Check the address (0x69, AD0 on pin 17) and the wiring. Re-run the two-pose check. A systematic tilt goes into <code>IMU_BIAS_DEG</code>.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">7</span><h4>Timing budget under load</h4><span class="pill next">next</span><span class="eta">15 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>At 50 Hz the network has 20 ms per step. Today's run on the Pi measured an inference p99 of 16.7 ms and a worst case of 22.4 ms, which is tight. Training only allows 0 to 1 step of sensor delay.</div>
+          <div><b>How</b>Leave the policy running in shadow mode (torque off) for 10 minutes with the Pi in the head, and read <code>feedback_hz</code>, <code>loop_missed</code> and <code>inference_ms</code>. Stop the pichat service while walking, and set the CPU governor to performance.</div>
+          <div class="pass"><b>Pass when</b>Feedback ≥ 98 Hz, policy steady at 50 Hz, inference p99 under 15 ms, and no overruns.</div>
+          <div class="fail"><b>If it fails</b>Trim background services, pin the loop thread to its own core, or retrain with an action delay (phase 6).</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">8</span><h4>Power budget under load</h4><span class="pill next">next</span><span class="eta">10 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>Fifteen servos holding a crouch draw much more current than a sitting duck. A voltage dip resets the IMU or browns out the Pi.</div>
+          <div><b>How</b>Hold the home pose for 5 minutes, supported. Watch <code>vcgencmd get_throttled</code>, the battery voltage, the servo temperatures, and how warm the UBEC gets.</div>
+          <div class="pass"><b>Pass when</b>Throttled stays 0x0, the voltage drops less than 0.4 V, no servo is above 55 °C, and the UBEC is only warm.</div>
+          <div class="fail"><b>If it fails</b>Use thicker battery leads, fit a capacitor at the URT-2 terminal, and lower holding stiffness when idle.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">9</span><h4>Telemetry recorder</h4><span class="pill later">to build</span><span class="eta">1 h</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>Every later decision (is the policy failing? is the model wrong?) needs a recording to compare with the simulation.</div>
+          <div><b>How</b>A small tool that records <code>/api/status</code> at 50 Hz to CSV: targets against actual angles, gyro, gravity, voltage, temperatures and commands. The test-lab replays here already use the same format.</div>
+          <div class="pass"><b>Pass when</b>A 1-minute recording replays on this page's 3D duck.</div>
+          <div class="fail"><b>If it fails</b>If 50 Hz over HTTP is too slow, record on the Pi itself and copy the file over.</div>
+        </div></li>
     </ol>
-    <p class="note red">Before arming the policy: set the web page's head sliders back to 0. Today we moved them while the duck was disarmed and nothing happened, because they're requests to the policy, not servo controls. When armed, the policy would start with the head turned.</p>
   </article>
 
-  <article class="chapter" id="controller" data-duck="controller">
-    <h3><small>Planned</small>Driving it with an Xbox controller</h3>
-    <p>Microduck builders drive their ducks with a gamepad. The Pi Zero 2 W has Bluetooth on board, so an Xbox Wireless Controller can connect directly. Try the pad below (or W/A/S/D): it steers the duck on the bench the same way the sticks will.</p>
+  <article class="chapter wide" id="stand" data-duck="stand">
+    <div class="group-title"><span class="pill next">gate 4</span><h3>C · First motion with the original policy</h3></div>
+    <ol class="ladder" start="10">
+      <li class="rung"><div class="rung-head"><span class="n">10</span><h4>Default pose: in the air, then on the table</h4><span class="pill next">next</span><span class="eta">15 min</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>This is the first time the software, not our test tool, drives all 15 servos. The button sends the home pose directly, with no ramp.</div>
+          <div><b>How</b>Head sliders back to 0. Hand-pose the duck close to the home pose (hips and ankles ±23°, neck 20°), hold it in the air, press "Default pose". Then set it down on a soft mat with your hands around it.</div>
+          <div class="pass"><b>Pass when</b>No jump bigger than a few degrees, and it stands 30 s on its own with servos under 55 °C.</div>
+          <div class="fail"><b>If it fails</b>Go back to rungs 1 and 3. A lean usually means a zero or the IMU. A twitch usually means stiffness or delay.</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">11</span><h4>Walking ladder</h4><span class="pill later">later</span><span class="eta">1 h</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>The walk policy was trained for 0.4 m/s forward, 0.3 sideways and 1.0 rad/s turning. Our head is about 23 g heavier, so we expect it to tip forward.</div>
+          <div><b>How</b>Walk at 0.1 m/s for 1 m, then 0.2, then turns at ±0.5 rad/s, then sideways, then 0.4. Record every run (rung 9). Keep a hand or a loose string near it.</div>
+          <div class="pass"><b>Pass when</b>Two minutes of mixed commands without a fall, with tracking error under about 30 %.</div>
+          <div class="fail"><b>If it fails</b>First try simple fixes: a small head-pitch command back, or an IMU pitch offset. If it still falls, move on to phase 6 (retraining).</div>
+        </div></li>
+      <li class="rung"><div class="rung-head"><span class="n">12</span><h4>Get-up, pick, roulade</h4><span class="pill later">later</span><span class="eta">1 h</span></div>
+        <div class="rung-grid">
+          <div><b>Why</b>These are the most violent motions. Get-up and roulade throw the head mass around.</div>
+          <div><b>How</b>Get-up from lying on its back, on a soft mat, then pick with the beak, then roulade last. Watch the head shell screws and the jumper wires in the head.</div>
+          <div class="pass"><b>Pass when</b>Three get-ups in a row work, and nothing comes loose.</div>
+          <div class="fail"><b>If it fails</b>The standup and roulade tasks exist in the training code. Retrain them with our head (phase 6).</div>
+        </div></li>
+    </ol>
+  </article>
+
+  <article class="chapter wide" id="controller" data-duck="controller">
+    <div class="group-title"><span class="pill later">phase 5</span><h3>Driving it with an Xbox controller</h3></div>
+    <p>Microduck builders drive their ducks with a gamepad. The Pi Zero 2 W has Bluetooth on board, so an Xbox Wireless Controller can pair directly with the duck. Try the pad below (or W/A/S/D): it steers the duck on the bench the same way the sticks will.</p>
     <div class="pad-wrap">
       <div class="pad" id="pad" role="slider" aria-label="Virtual stick: up and down is forward speed, left and right is turning" aria-valuetext="stopped" tabindex="0"><div class="knob" id="knob"></div></div>
       <div class="readout" aria-live="off">
@@ -505,68 +642,195 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
         <span style="color:var(--muted)">Dead zone 0.1, like the web joystick.</span>
       </div>
     </div>
-    <p>The plan:</p>
-    <ul>
-      <li>Pair with <code>bluetoothctl</code>, and read the controller with Python <code>evdev</code> in a small service next to the robot.</li>
-      <li>Left stick sets forward and sideways speed, right stick sets turning. Bumpers move the head, a trigger opens the beak. A, B and X start get-up, pick and roulade. Start arms, back disarms.</li>
-      <li>It posts to the same <code>/api/mode</code> and <code>/api/command</code> routes as the web page, so the safety rules stay the same. If the controller disconnects, commands stop, and the 250 ms timeout disarms the duck.</li>
-      <li>A side effect of a wiring choice: the UART link would have needed <code>dtoverlay=disable-bt</code>, which turns Bluetooth off. Keeping the URT-2 on USB keeps Bluetooth free.</li>
-    </ul>
+    <ol class="steps">
+      <li><div><b>Controller</b><span>An Xbox Wireless Controller with Bluetooth (the newer ones also speak Bluetooth LE). Update its firmware on a PC or console first.</span></div></li>
+      <li><div><b>Pair</b><span>On the Pi: <code>bluetoothctl</code> → <code>scan on</code> → <code>pair</code> / <code>trust</code> / <code>connect</code> with the controller's address. Check that it shows up as an input device with <code>evtest</code>.</span></div></li>
+      <li><div><b>Keep Bluetooth on</b><span>The UART link to the URT-2 would have needed <code>dtoverlay=disable-bt</code>, which turns Bluetooth off. Keeping the URT-2 on USB keeps Bluetooth free.</span></div></li>
+      <li><div><b>Gamepad service</b><span>A small Python service (<code>evdev</code>) next to the robot software sends the same <code>/api/mode</code> and <code>/api/command</code> requests as the web page, 20 times a second. That way all the existing safety rules apply.</span></div></li>
+      <li><div><b>Mapping</b><span>Left stick: forward and sideways speed. Right stick: turning. Bumpers move the head, right trigger opens the beak. A: get-up, B: pick, X: roulade. Hold Start for 1 s to arm, Back disarms.</span></div></li>
+      <li><div><b>Safety</b><span>If the controller disconnects, commands stop. The 250 ms timeout then disarms the duck on its own. Arming needs a deliberate 1 s hold.</span></div></li>
+      <li><div><b>Test</b><span>First with torque off (watch the command values in <code>/api/status</code>), then in the air, then on the floor at reduced speed limits.</span></div></li>
+    </ol>
   </article>
 
-  <article class="chapter" id="camera" data-duck="camera">
-    <h3><small>Planned</small>Giving the duck an eye</h3>
-    <p>A DAOKAI OV5647 camera module (25 × 24 × 9 mm, 72° lens, €9.24) goes behind the right eye on a printed mount. The ribbon runs over the Pi to its 22-pin camera connector. We returned the USB camera we tried first: too big for the head, and it would have taken the Pi's only data port.</p>
-    <ul>
-      <li>It's mounted upside down, so the image is rotated 180° in software.</li>
-      <li>First use: a live view in the web page.</li>
-      <li>Then: face tracking through the four head channels, so the duck looks at you while it walks.</li>
-      <li>Later: vision inputs for new trained behaviours (see <a href="#rl">phase 04</a>).</li>
-    </ul>
+  <article class="chapter wide" id="camera" data-duck="camera">
+    <div class="group-title"><span class="pill later">phase 5</span><h3>Giving the duck an eye</h3></div>
+    <p>A DAOKAI OV5647 camera module (25 × 24 × 9 mm, 72° lens, €9.24) goes behind the right eye on a printed mount. Its ribbon runs over the Pi to the 22-pin camera connector. We returned the USB camera we tried first: too big for the head, and it would have taken the Pi's only data port. The simulation model already has a <code>head_camera</code> point in the same place, so a camera-based skill can be trained later.</p>
+    <ol class="steps">
+      <li><div><b>Fit and detect</b><span>Print <code>camera_mount</code>, <code>eye_cam</code> and <code>eye_shell_v2</code>. Connect the ribbon with the contacts the right way round, then <code>rpicam-hello --list-cameras</code>.</span></div></li>
+      <li><div><b>Rotate</b><span>It's mounted upside down, so flip both directions in software (a 180° transform in Picamera2).</span></div></li>
+      <li><div><b>Live view</b><span>MJPEG at 640 × 480, 15 fps, shown in the web page. Measure CPU use against rung 7's timing budget. The policy has to stay at 50 Hz.</span></div></li>
+      <li><div><b>Look at me</b><span>Face detection on a small image (320 × 240, about 5 fps) turns the face position into the four head commands. The walking policy already knows how to move the head while it balances, so no retraining is needed.</span></div></li>
+      <li><div><b>Follow me</b><span>Face size and position become forward speed and turning. Again no retraining, just commands.</span></div></li>
+      <li><div><b>Learned vision</b><span>Later: train skills that use the camera in simulation (phase 7).</span></div></li>
+    </ol>
   </article>
 </section>
 
 <!-- ================= PHASE 4 ================= -->
 <section class="phase" aria-labelledby="p4">
-  <header class="phase-head"><span class="phase-num">04</span><span class="eyebrow">Phase 4 · learn</span><h2 id="p4">The reinforcement-learning plan</h2></header>
+  <header class="phase-head"><span class="phase-num">04</span><span class="eyebrow">Phase 6 and 7 of the plan · deep dive</span><h2 id="p4">Reinforcement learning, step by step</h2></header>
 
   <article class="chapter wide" id="rl" data-duck="rl">
-    <h3><small>From simulation to servos</small>How the duck learns</h3>
-    <p>The walking skill is a small neural network trained by trial and error (PPO) in MuJoCo, on thousands of simulated ducks at once. Every robot in the simulation has the exact masses and inertias from CAD, and the servos follow a measured model of the HLS1910. The result is exported as an ONNX file that the Pi runs 50 times a second.</p>
-    <div class="diagram" role="img" aria-label="Training pipeline from CAD to robot">
+    <h3><small>The big picture</small>From simulation to servos</h3>
+    <p>The duck's skills are small neural networks trained by trial and error in a physics simulator. Thousands of virtual ducks try to walk at once. Every step they get points for following the joystick command and for staying upright, and lose points for slipping, jerking and falling. The training algorithm (PPO) slowly shifts the network towards whatever earned more points. The result is an ONNX file of a few hundred kilobytes that the Pi runs 50 times a second.</p>
+    <div class="diagram" role="img" aria-label="Training pipeline from CAD to robot and back">
       <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
         <rect class="dg-box dg-fill-y" x="10" y="40" width="130" height="80" rx="10"/><text class="dg-t" x="22" y="64">CAD + masses</text><text class="dg-s" x="22" y="84">MJCF robot model</text><text class="dg-s" x="22" y="100">+ our head (+23 g)</text>
         <rect class="dg-box dg-fill-b" x="160" y="40" width="150" height="80" rx="10"/><text class="dg-t" x="172" y="64">mjlab PPO</text><text class="dg-s" x="172" y="84">4096 ducks · CUDA</text><text class="dg-s" x="172" y="100">BAM servo model</text>
-        <rect class="dg-box dg-fill-b" x="330" y="40" width="130" height="80" rx="10"/><text class="dg-t" x="342" y="64">ONNX export</text><text class="dg-s" x="342" y="84">obs 61 → act 14</text><text class="dg-s" x="342" y="100">drop-in file</text>
-        <rect class="dg-box dg-fill-g" x="480" y="40" width="130" height="80" rx="10"/><text class="dg-t" x="492" y="64">Sim-to-sim</text><text class="dg-s" x="492" y="84">MuJoCo on the Mac</text><text class="dg-s" x="492" y="100">before hardware</text>
-        <rect class="dg-box dg-fill-o" x="630" y="40" width="120" height="80" rx="10"/><text class="dg-t" x="642" y="64">The duck</text><text class="dg-s" x="642" y="84">Pi · 50 Hz</text><text class="dg-s" x="642" y="100">supported tests</text>
+        <rect class="dg-box dg-fill-b" x="330" y="40" width="130" height="80" rx="10"/><text class="dg-t" x="342" y="64">ONNX export</text><text class="dg-s" x="342" y="84">obs 61 → act 14</text><text class="dg-s" x="342" y="100">normalization baked in</text>
+        <rect class="dg-box dg-fill-g" x="480" y="40" width="130" height="80" rx="10"/><text class="dg-t" x="492" y="64">Sim-to-sim</text><text class="dg-s" x="492" y="84">plain MuJoCo, Mac</text><text class="dg-s" x="492" y="100">same 61 inputs</text>
+        <rect class="dg-box dg-fill-o" x="630" y="40" width="120" height="80" rx="10"/><text class="dg-t" x="642" y="64">The duck</text><text class="dg-s" x="642" y="84">Pi · 50 Hz</text><text class="dg-s" x="642" y="100">staged tests</text>
         <path class="dg-e data" d="M140 80 H160"/><path class="dg-e data" d="M310 80 H330"/><path class="dg-e data" d="M460 80 H480"/><path class="dg-e data" d="M610 80 H630"/>
-        <path class="dg-e data plan" d="M690 120 V160 H75 V120"/><text class="dg-l" x="240" y="178">telemetry from /api/status feeds the next training run</text>
+        <path class="dg-e data plan" d="M690 120 V160 H75 V120"/><text class="dg-l" x="210" y="178">telemetry recordings (rung 9) correct the model for the next run</text>
       </svg>
     </div>
-    <ol class="steps">
-      <li><div><b>Run the upstream policies as they are</b><span>They were trained for the original XGO-Duck. If the duck walks with them, the port works end to end.</span></div></li>
-      <li><div><b>Measure what's different</b><span>Head mass (Pi + tray + camera, about +23 g), the IMU's position and noise (MPU6050 on the battery box, not the QMI8658), USB latency, and servo 24's friction.</span></div></li>
-      <li><div><b>Update the model</b><span>Head body mass and inertia, the IMU site, and friction ranges in the MJCF.</span></div></li>
-      <li><div><b>Retrain on a rented GPU</b><span><code>uv run train Mjlab-Velocity-Flat-XgoDuck --env.scene.num-envs 4096</code>. Randomize mass, friction and latency so the policy survives the real robot.</span></div></li>
-      <li><div><b>Check sim-to-sim, then on the robot</b><span>Run the new ONNX in plain MuJoCo first, then on the duck held in the air, then supported, then free.</span></div></li>
-      <li><div><b>New skills</b><span>Use the camera: look at a face, follow a ball. The four head channels are the bridge between vision and the walking policy.</span></div></li>
+  </article>
+
+  <article class="chapter wide" id="rl-obs" data-duck="rl-obs">
+    <h3><small>Inputs and outputs</small>What the network sees and does</h3>
+    <p>Fifty times a second the network gets 61 numbers and returns 14. The outputs are joint angles relative to the home pose, in radians. The fast loop turns them into servo goals, and each servo's own controller (KP 6) does the rest.</p>
+    <div class="diagram" role="img" aria-label="61 observation inputs split into groups, the network, and 14 action outputs">
+      <svg viewBox="0 0 760 264" xmlns="http://www.w3.org/2000/svg" id="obsSvg"></svg>
+    </div>
+    <ul>
+      <li><b>Gyro and gravity (6):</b> from the IMU. This is why rung 6 matters.</li>
+      <li><b>Joint angles and speeds (28):</b> relative to the home pose. This is why the zeros matter.</li>
+      <li><b>Last action (14):</b> lets the network move smoothly. The output is also smoothed (α 0.45).</li>
+      <li><b>Twist (3):</b> the joystick or Xbox command: forward, sideways, turn.</li>
+      <li><b>Head (4):</b> neck pitch, head pitch, head yaw and head roll targets. This is the hook for the camera.</li>
+      <li><b>Six padding values:</b> zeros in walking. Pick uses them for its phase clock, and the roulade "Angle" variant uses one for the roll angle.</li>
+    </ul>
+  </article>
+
+  <article class="chapter wide" id="rl-train" data-duck="rl-train">
+    <h3><small>From the training code</small>How the walk was trained</h3>
+    <div class="kv">
+      <div><b>4096</b><span>ducks simulated in parallel</span></div>
+      <div><b>98,304</b><span>samples per update (24 steps × 4096)</span></div>
+      <div><b>≤ 50,000</b><span>PPO iterations</span></div>
+      <div><b>50 Hz</b><span>policy rate, the same as on the Pi</span></div>
+      <div><b>γ 0.99 · λ 0.95</b><span>discount and GAE</span></div>
+      <div><b>lr 1e-3 · clip 0.2</b><span>entropy 0.01</span></div>
+    </div>
+    <p><b>Reward weights</b> in the walking task. Positive terms are what the duck should do, negative terms are what it should avoid. Foot clearance and swing height also push each step to lift the foot about 2 cm.</p>
+    <div class="diagram" role="img" aria-label="Bar chart of reward weights"><svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" id="rewardSvg"></svg></div>
+    <p><b>Domain randomization</b> is how a policy survives the real robot. Every virtual duck is slightly different, so the network learns to cope with the differences:</p>
+    <div class="tablewrap"><table class="compare">
+      <thead><tr><th scope="col">Randomized</th><th scope="col">Range in training</th><th scope="col">What it covers on the real duck</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Mass and inertia</th><td class="num">±5 %</td><td>Printing differences, screws, cables</td></tr>
+        <tr><th scope="row">Torso centre of mass</th><td class="num">±3 mm → ±8 mm</td><td>Battery position, wiring</td></tr>
+        <tr><th scope="row">Head centre of mass</th><td class="num">±3 mm, widened by curriculum</td><td>What the head carries. Our Pi is a bigger change than this.</td></tr>
+        <tr><th scope="row">Servo stiffness KP / damping KD</th><td class="num">±15 % / ±10 %</td><td>Servo-to-servo spread</td></tr>
+        <tr><th scope="row">Joint friction, damping, armature</th><td class="num">±10 %</td><td>Gear wear. Servo 24 may sit outside this.</td></tr>
+        <tr><th scope="row">Foot friction</th><td class="num">0.7 – 1.3</td><td>Table, floor, mat</td></tr>
+        <tr><th scope="row">Pushes</th><td class="num">±0.3 m/s every 3–6 s</td><td>Bumps, hands, cables</td></tr>
+        <tr><th scope="row">IMU mounting error</th><td class="num">up to 6°</td><td>How flat the MPU6050 is mounted</td></tr>
+        <tr><th scope="row">Encoder offset per joint</th><td class="num">±0.015 rad (±0.86°)</td><td>Calibration accuracy (rungs 1 to 3)</td></tr>
+        <tr><th scope="row">Start tilt</th><td class="num">±10° pitch, ±5° roll</td><td>Being put down crooked</td></tr>
+        <tr><th scope="row">Sensor noise</th><td class="num">gyro ±0.03 rad/s, gravity ±0.01, joint speed ±0.25</td><td>MPU6050 noise, encoder steps</td></tr>
+        <tr><th scope="row">IMU delay</th><td class="num">0 – 1 step (≤ 20 ms)</td><td>Loop timing (rung 7)</td></tr>
+        <tr><th scope="row">Commands</th><td class="num">vx ±0.4 · vy ±0.3 · ωz ±1.0</td><td>Joystick and Xbox limits</td></tr>
+      </tbody>
+    </table></div>
+    <p>The servo itself is simulated with BAM (Better Actuator Models), fitted to the HD-1910. That's the same servo we use. It even includes a 6 ms command delay and the gear friction.</p>
+  </article>
+
+  <article class="chapter wide" id="rl-gap" data-duck="rl-gap">
+    <h3><small>Gap analysis</small>Where our duck differs from the trained one</h3>
+    <div class="tablewrap"><table class="compare">
+      <thead><tr><th scope="col">Difference</th><th scope="col">Trained for</th><th scope="col">Our duck</th><th scope="col">Risk</th><th scope="col">What we do</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Head mass</th><td>174 g head body, ±5 %</td><td>≈ +23 g (≈ +13 %): Pi, tray, camera</td><td class="risk-h">high</td><td>Weigh it, try the upstream policy first, retrain if it tips (P6)</td></tr>
+        <tr><th scope="row">Encoder zeros</th><td>±0.86° per joint</td><td>Taught by hand. Hips unconfirmed (24° hand-held)</td><td class="risk-h">high</td><td>Rungs 1 to 3 before any walking</td></tr>
+        <tr><th scope="row">IMU</th><td>QMI8658, ≤ 6° tilt, ±0.03 rad/s noise</td><td>MPU6050 on the battery box, 0.042 rad/s bias</td><td class="risk-m">medium</td><td>Axes check and bias subtraction (rung 6)</td></tr>
+        <tr><th scope="row">Loop timing</th><td>STM32 at 100 Hz, ≤ 1 step delay</td><td>Python over USB. Inference p99 16.7 ms, worst 22.4 ms</td><td class="risk-m">medium</td><td>Rung 7. Add action-delay randomization if retraining</td></tr>
+        <tr><th scope="row">Servo friction</th><td>±10 %</td><td>Servo 24 stalls 9° short at KP 4</td><td class="risk-m">medium</td><td>Check at KP 6, widen friction randomization</td></tr>
+        <tr><th scope="row">IMU position</th><td>IMU site in the torso</td><td>On the back of the battery box</td><td class="risk-l">low</td><td>Same rigid body, so the same rotation and gravity. Only the orientation matters.</td></tr>
+        <tr><th scope="row">Battery</th><td>8.4 V Li-ion pack</td><td>2S LiPo, 7.4 to 8.4 V</td><td class="risk-l">low</td><td>Low-battery cutoff (rung 5)</td></tr>
+        <tr><th scope="row">Servo model</th><td>HD-1910 (BAM fit)</td><td>HD-1910</td><td class="risk-l">none</td><td>Same part</td></tr>
+      </tbody>
+    </table></div>
+  </article>
+
+  <article class="chapter wide" id="rl-workflow" data-duck="rl-workflow">
+    <h3><small>Phase 6 · exhaustive</small>Our own training run, in ten steps</h3>
+    <ol class="ladder">
+      <li class="rung"><div class="rung-head"><span class="n">1</span><h4>Get a GPU</h4><span class="eta">1 h</span></div>
+        <div class="rung-grid"><div><b>What</b>Training needs a CUDA GPU, Python 3.12 and <code>uv</code>. The repository can also submit runs as Hugging Face Jobs (<code>--hf-jobs</code>), so no local GPU is needed.</div><div><b>Command</b><code>cd xgoduck_rl &amp;&amp; uv sync</code> (on ARM GPUs set <code>UV_HTTP_TIMEOUT=600</code> first).</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">2</span><h4>Reproduce the baseline</h4><span class="eta">GPU hours</span></div>
+        <div class="rung-grid"><div><b>What</b>Train the stock walk before changing anything, and check it behaves like the shipped <code>xgoduck_walk.onnx</code>. This proves the setup works.</div><div><b>Command</b><code>uv run train Mjlab-Velocity-Flat-XgoDuck --env.scene.num-envs 4096</code>, then <code>uv run play Mjlab-Velocity-Flat-XgoDuck</code>.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">3</span><h4>Measure our duck</h4><span class="eta">1 h</span></div>
+        <div class="rung-grid"><div><b>What</b>Weigh the head assembly with everything in it, and find its balance point. Measure servo 24's friction (KP 4, 6 and 8). Measure loop latency: time from a command until the feedback changes. Take numbers from the rung 9 recordings.</div><div><b>Why</b>The model can only be as right as these numbers. Each one becomes an edit or a randomization range.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">4</span><h4>Update the robot model</h4><span class="eta">1 h</span></div>
+        <div class="rung-grid"><div><b>What</b>In <code>robot_walk.xml</code>, set the mass, centre of mass and inertia of the head body (where the Pi sits). Keep the IMU site: on the same rigid torso, gyro and gravity don't change.</div><div><b>Check</b>Open the model in the MuJoCo viewer (<code>view.py</code>). Total mass should match the scale, and nothing should collide in the home pose.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">5</span><h4>Tune the randomization</h4><span class="eta">30 min</span></div>
+        <div class="rung-grid"><div><b>What</b>Widen the head mass and centre-of-mass ranges around the new value. Add an action delay of 0 to 1 step for our USB loop. Widen joint friction if servo 24 needs it. Keep the pushes at ±0.3 m/s: the training notes say larger pushes make the gait nervous.</div><div><b>Watch</b>Each range you widen makes the task harder. Change one thing at a time.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">6</span><h4>Train and monitor</h4><span class="eta">GPU hours</span></div>
+        <div class="rung-grid"><div><b>What</b>Train the flat walk first, then the rough-terrain version for robustness (floors aren't flat). In TensorBoard, mean reward should rise and level off, and episode length should reach the maximum (no falls).</div><div><b>Stop when</b>The tracking rewards level off and falls are rare under pushes.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">7</span><h4>Export to ONNX</h4><span class="eta">5 min</span></div>
+        <div class="rung-grid"><div><b>What</b>Export bakes the input normalization into the file, so the Pi needs no extra code.</div><div><b>Command</b><code>uv run python scripts/export.py Mjlab-Velocity-Flat-XgoDuck --checkpoint-file …/model_XXXX.pt --onnx-file …/run.onnx</code></div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">8</span><h4>Sim-to-sim on the Mac</h4><span class="eta">1 h</span></div>
+        <div class="rung-grid"><div><b>What</b>Run the ONNX in plain MuJoCo with exactly the Pi's input pipeline (<code>rl_core.py</code>). This catches wrong input order, units and signs before they can break a servo.</div><div><b>Pass when</b>It walks in plain MuJoCo, with pushes, at all command speeds.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">9</span><h4>Deploy beside the old policy</h4><span class="eta">10 min</span></div>
+        <div class="rung-grid"><div><b>What</b>Copy the new file next to the upstream policies under a new name, and keep <code>xgoduck_walk.onnx</code> as the fallback. Switch by config, restart, and check the model line in <code>/api/status</code>.</div><div><b>Rollback</b>Switch the config back. Nothing is overwritten.</div></div></li>
+      <li class="rung"><div class="rung-head"><span class="n">10</span><h4>Staged rollout and comparison</h4><span class="eta">2 h</span></div>
+        <div class="rung-grid"><div><b>What</b>Repeat rungs 10 and 11 with the new policy, recording everything. Compare the real joint tracking and body tilt with the simulation.</div><div class="pass"><b>Gate 6 passes when</b>It falls less and tracks commands better than the upstream policy on our duck. If not, the recordings show which model number to fix (back to step 3).</div></div></li>
     </ol>
-    <p class="note blue">The get-up you see on the bench is keyframed for illustration, and so is the walk. The real motions come from the trained policies.</p>
+  </article>
+
+  <article class="chapter wide" id="rl-skills" data-duck="rl-skills">
+    <h3><small>Phase 7</small>Skills after walking</h3>
+    <p>The training code already contains more tasks than the four we ship. Each one can be retrained for our duck the same way:</p>
+    <div class="kv">
+      <div><b>StandUp</b><span>get up from any fall, flat or rough</span></div>
+      <div><b>SitStand</b><span>sit down and stand up on command</span></div>
+      <div><b>GroundPick</b><span>pick an object up with the beak</span></div>
+      <div><b>BallKick</b><span>kick a ball, left or right foot</span></div>
+      <div><b>Roulade · Angle</b><span>roll, optionally steering by roll angle</span></div>
+      <div><b>Velocity-Swizzle</b><span>a walking variant with its own settings</span></div>
+    </div>
+    <p>Combined with the camera and the controller:</p>
+    <ul>
+      <li><b>Look at me</b> (no retraining): the camera finds a face and steers the four head channels while the duck walks.</li>
+      <li><b>Follow me</b> (no retraining): face position and size become walking commands.</li>
+      <li><b>Kick the ball I show it</b>: ball detection picks the foot and the approach, then the BallKick policy runs.</li>
+      <li><b>Sit when I sit</b>: a pose or gesture detector triggers SitStand.</li>
+      <li><b>Learned vision</b> (research): train with the simulated <code>head_camera</code> so the camera feeds the network directly.</li>
+    </ul>
+  </article>
+
+  <article class="chapter wide" id="rl-risks" data-duck="rl-risks">
+    <h3><small>What could go wrong</small>Risks and how we limit them</h3>
+    <div class="tablewrap"><table class="compare">
+      <thead><tr><th scope="col">Risk</th><th scope="col">Effect</th><th scope="col">Mitigation</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Falls</th><td>Broken prints, stripped servo gears</td><td>Soft mat, hands around it, slow command limits first, loose safety string</td></tr>
+        <tr><th scope="row">Servo overheating</th><td>Weak or dead servo</td><td>Temperature readout, stop above 55 °C, never stall for long (the upstream warning)</td></tr>
+        <tr><th scope="row">Battery over-discharge</th><td>Damaged LiPo</td><td>6.6 V cutoff refuses arming, charge off the robot only</td></tr>
+        <tr><th scope="row">Wrong joint sign or zero</th><td>The policy fights the robot</td><td>Rungs 1 to 3, gate 2</td></tr>
+        <tr><th scope="row">CPU overload (camera + policy)</th><td>Late actions, wobbly gait</td><td>Timing budget (rung 7), low-resolution vision, measure before walking with the camera on</td></tr>
+        <tr><th scope="row">Bluetooth drop</th><td>Stale command</td><td>250 ms timeout disarms. Arming needs a deliberate hold.</td></tr>
+        <tr><th scope="row">Model doesn't match the real duck</th><td>The policy works in sim, fails for real</td><td>Measure (step 3), sim-to-sim (step 8), recordings, one change at a time</td></tr>
+        <tr><th scope="row">Losing the calibration</th><td>Every pose wrong</td><td>Backup script into git (rung 4)</td></tr>
+      </tbody>
+    </table></div>
   </article>
 
   <article class="chapter wide" id="roadmap" data-duck="roadmap">
-    <h3><small>Where we are</small>Roadmap</h3>
+    <h3><small>Where we are</small>Roadmap at a glance</h3>
     <ol class="road">
       <li><a href="#print"><span class="pill done">done</span><h4>Body printed and assembled</h4><p>15 servos, IDs set, chains soldered</p></a></li>
       <li><a href="#power"><span class="pill done">done</span><h4>Pi on battery</h4><p>UBEC 5.20 V, no undervoltage</p></a></li>
       <li><a href="#software"><span class="pill done">done</span><h4>Software port</h4><p>99.8 Hz loop, 48 tests</p></a></li>
       <li><a href="#tests"><span class="pill now">now</span><h4>Zeros and torque tests</h4><p>Zeros taught, visual check open</p></a></li>
-      <li><a href="#imu"><span class="pill next">next</span><h4>IMU and safety update</h4><p>Battery box, axes, bias</p></a></li>
-      <li><a href="#stand"><span class="pill next">next</span><h4>Stand and walk</h4><p>Supported first</p></a></li>
-      <li><a href="#controller"><span class="pill later">later</span><h4>Xbox controller</h4><p>Bluetooth + evdev</p></a></li>
-      <li><a href="#camera"><span class="pill later">later</span><h4>Camera</h4><p>OV5647 behind the eye</p></a></li>
-      <li><a href="#rl"><span class="pill later">later</span><h4>Own training runs</h4><p>Heavier head, new skills</p></a></li>
+      <li><a href="#ladder"><span class="pill next">next</span><h4>Finish calibration</h4><p>Neck zeros, directions, backup</p></a></li>
+      <li><a href="#imu"><span class="pill next">next</span><h4>Harden hardware</h4><p>Safety update, IMU, timing, power</p></a></li>
+      <li><a href="#stand"><span class="pill next">next</span><h4>Stand and walk</h4><p>Original policy, supported first</p></a></li>
+      <li><a href="#controller"><span class="pill later">later</span><h4>Xbox + camera</h4><p>Bluetooth, look at me</p></a></li>
+      <li><a href="#rl-workflow"><span class="pill later">later</span><h4>Own training</h4><p>Heavier head, ten steps</p></a></li>
+      <li><a href="#rl-skills"><span class="pill later">later</span><h4>New skills</h4><p>Kick, sit, follow</p></a></li>
     </ol>
   </article>
 </section>
@@ -615,10 +879,12 @@ footer{border-top:2px solid var(--ink); padding-top:16px; font-size:14px; color:
     <div class="tip" id="tip" hidden></div>
   </div>
   <div class="chips" id="chips"></div>
+  <div class="planstrip" id="planStrip" aria-label="Plan phases"></div>
   <div class="minimap"><div class="lbl"><span>System map</span><span>click to jump</span></div><div id="archMini"></div></div>
 </aside>
 </div>
 
+<script src="assets/duck_model.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -793,9 +1059,135 @@ document.querySelectorAll('.dg-node').forEach(g => {
   g.addEventListener('click', go);
   g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
 });
-const SECTION_NODES = {idea:['pol'],original:['mcu','pol'],map:[],print:['legl','legr','neck'],head:['mcu','pol','web'],power:['bat','ubec'],
+const SECTION_NODES = {plan:[],ladder:['mac','urt','legl','legr','neck'],'rl-obs':['pol','imu'],'rl-train':['gpu'],'rl-gap':['imu','pol','mcu'],'rl-workflow':['gpu','pol','mac'],'rl-skills':['cam','pol','pad'],'rl-risks':[],idea:['pol'],original:['mcu','pol'],map:[],print:['legl','legr','neck'],head:['mcu','pol','web'],power:['bat','ubec'],
   wiring:['urt','legl','legr','neck'],software:['mcu','pol','web'],calibration:['mac','urt'],tests:['legl','legr','neck','mac'],
   imu:['imu'],stand:['pol','legl','legr'],controller:['pad'],camera:['cam'],rl:['gpu','pol'],roadmap:[],mistakes:[],bom:[],top:[]};
+
+/* --------------------------------------------------------- master plan */
+const PLAN = [
+  {n:1, name:'Build', st:'done', steps:[['Print and assemble','done','print'],['Servo IDs and chains','done','wiring'],['Pi in the head','done','head'],['5 V from the battery','done','power']],
+   gate:['G1','15 IDs answer on the bus · 5.20 V · no undervoltage','done']},
+  {n:2, name:'Calibrate', st:'now', steps:[['Teach zeros','done','calibration'],['Torque tests','done','tests'],['Legs straight? eye check','now','ladder'],['Neck and head zeros','next','ladder'],['Joint directions','next','ladder']],
+   gate:['G2','every joint within 1° of the model and turning the same way','open']},
+  {n:3, name:'Harden', st:'next', steps:[['Safety update','next','imu'],['IMU axes and bias','next','imu'],['Timing budget','next','imu'],['Power budget','next','imu'],['Telemetry recorder','later','imu']],
+   gate:['G3','gravity right in 6 poses · inference p99 < 15 ms · no throttling','open']},
+  {n:4, name:'Walk', sub:'original policy', st:'next', steps:[['Default pose','next','stand'],['Supported stand','next','stand'],['Walk 0.1 → 0.4 m/s','later','stand'],['Get-up, pick, roulade','later','stand']],
+   gate:['G4','two minutes of walking without a fall?','open'], fail:true},
+  {n:5, name:'Interact', sub:'alongside 4', st:'later', steps:[['Xbox controller','later','controller'],['Camera live view','later','camera'],['Look at me, follow me','later','camera']]},
+  {n:6, name:'Retrain', sub:'only if G4 fails', st:'later', steps:[['GPU and baseline','later','rl-workflow'],['Measure our duck','later','rl-workflow'],['Model and randomization','later','rl-workflow'],['Train and export','later','rl-workflow'],['Sim-to-sim','later','rl-workflow'],['Staged rollout','later','rl-workflow']],
+   gate:['G6','falls less and tracks better than the original policy','open']},
+  {n:7, name:'New skills', st:'later', steps:[['Stand-up, sit-stand','later','rl-skills'],['Ball kick','later','rl-skills'],['Camera-driven skills','later','rl-skills']]}
+];
+function wrapText(t, maxChars){
+  const out = []; let line = '';
+  t.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > maxChars && line) { out.push(line); line = w; } else line = (line + ' ' + w).trim(); });
+  if (line) out.push(line); return out;
+}
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+function planSVG(){
+  const W = 760, X0 = 168, AW = W - X0 - 14, BH = 92, GH = 52, GAP = 8;
+  let y = 14, body = '', gate4 = 0, band6 = 0, band7 = 0;
+  PLAN.forEach((ph, pi) => {
+    const top = y;
+    body += `<rect class="pl-band ${ph.st === 'now' ? 'now' : ''}" x="8" y="${top}" width="${W - 16}" height="${BH}" rx="12"/>`;
+    body += `<text class="pl-ph" x="22" y="${top + 34}">${ph.n}</text><text class="pl-pt" x="46" y="${top + 32}">${ph.name}</text>`;
+    if (ph.sub) body += `<text class="pl-ps" x="22" y="${top + 54}">${ph.sub}</text>`;
+    body += `<text class="pl-ps" x="22" y="${top + (ph.sub ? 72 : 54)}">${ph.st === 'done' ? '✓ done' : ph.st}</text>`;
+    const n = ph.steps.length, w = (AW - GAP * (n - 1)) / n;
+    ph.steps.forEach(([t, st, tgt], i) => {
+      const x = X0 + i * (w + GAP), lines = wrapText(t, Math.max(8, Math.floor((w - 16) / 7.6)));
+      body += `<g class="pl-step st-${st}" data-target="${tgt}" tabindex="0" role="link" aria-label="${esc(t)} (${st}). Jump to details.">`;
+      body += `<rect x="${x}" y="${top + 14}" width="${w}" height="${BH - 28}" rx="9"/>`;
+      const ty = top + 14 + (BH - 28) / 2 - (lines.length - 1) * 8 + 4;
+      lines.slice(0, 3).forEach((l, k) => body += `<text class="pl-pt" style="font-size:12.5px" x="${x + 9}" y="${ty + k * 16}">${esc(l)}</text>`);
+      body += `</g>`;
+      if (i < n - 1) body += `<path class="pl-arrow" d="M${x + w} ${top + BH / 2} h${GAP}" marker-end="url(#pa)"/>`;
+    });
+    if (ph.n === 6) band6 = top; if (ph.n === 7) band7 = top;
+    y += BH;
+    if (ph.gate) {
+      const [g, txt, st] = ph.gate, cy = y + GH / 2;
+      body += `<path class="pl-arrow" d="M80 ${y} V${cy - 15}"/>`;
+      body += `<g class="pl-gate gate-${st}"><polygon points="80,${cy - 15} 95,${cy} 80,${cy + 15} 65,${cy}"/></g>`;
+      body += `<text class="pl-pt" x="108" y="${cy - 2}">${g}</text><text class="pl-ps" x="108" y="${cy + 13}">${esc(txt)}${st === 'done' ? ' · passed' : ''}</text>`;
+      body += `<path class="pl-arrow" d="M80 ${cy + 15} V${y + GH}" marker-end="url(#pa)"/>`;
+      if (ph.fail) gate4 = cy;
+      y += GH;
+    } else {
+      body += `<path class="pl-arrow" d="M80 ${y} V${y + 22}" marker-end="url(#pa)"/>`;
+      y += 22;
+    }
+  });
+  // G4: fail -> phase 6 (right edge), pass -> phase 7 (left edge)
+  body += `<path class="pl-arrow fail" d="M560 ${gate4} H750 V${band6 + 46} H${W - 8}" marker-end="url(#pf)"/><text class="pl-ps" x="744" y="${gate4 - 6}" text-anchor="end" style="fill:var(--bad)">falls → retrain for our duck (6)</text>`;
+  body += `<path class="pl-arrow" style="stroke:var(--ok);stroke-dasharray:6 4" d="M65 ${gate4} H3 V${band7 + 46} H8" marker-end="url(#pk)"/><text class="pl-ps" x="300" y="${gate4 + 13}" style="fill:var(--ok)">walks → go straight to new skills (7)</text>`;
+  const defs = `<defs>
+    <marker id="pa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--ink)"/></marker>
+    <marker id="pf" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--bad)"/></marker>
+    <marker id="pk" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--ok)"/></marker></defs>`;
+  return `<svg viewBox="0 0 ${W} ${y + 6}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Master plan: seven phases with go/no-go gates">${defs}${body}</svg>`;
+}
+$('#planDiagram').innerHTML = planSVG();
+function jumpTo(id){ document.getElementById(id)?.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'}); }
+document.querySelectorAll('.pl-step').forEach(g => {
+  g.addEventListener('click', () => jumpTo(g.dataset.target));
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jumpTo(g.dataset.target); } });
+});
+const STRIP_TARGET = {1:'print',2:'calibration',3:'ladder',4:'stand',5:'controller',6:'rl-workflow',7:'rl-skills'};
+const PHASE_OF_SECTION = {print:1,head:1,power:1,wiring:1,software:2,calibration:2,tests:2,ladder:3,imu:3,stand:4,controller:5,camera:5,
+  rl:6,'rl-obs':6,'rl-train':6,'rl-gap':6,'rl-workflow':6,'rl-risks':6,'rl-skills':7};
+$('#planStrip').innerHTML = PLAN.map(ph => `<button type="button" class="${ph.st}" data-n="${ph.n}" title="Phase ${ph.n}: ${ph.name} (${ph.st})"><b>${ph.n}</b>${ph.name}</button>`).join('');
+document.querySelectorAll('#planStrip button').forEach(b => b.addEventListener('click', () => jumpTo(STRIP_TARGET[b.dataset.n])));
+function markPlan(){
+  const n = PHASE_OF_SECTION[activeSection];
+  document.querySelectorAll('#planStrip button').forEach(b => b.classList.toggle('here', +b.dataset.n === n));
+}
+
+/* --------------------------------------------------------- policy I/O diagram */
+(function obsDiagram(){
+  const segs = [['gyro',3,'y'],['gravity',3,'y'],['joint angles',14,'o'],['joint speeds',14,'o'],['last action',14,'b'],['twist',3,'g'],['head',4,'g'],['pad',6,'']];
+  const X = 20, W = 720, u = W / 61; let x = X, s = '';
+  s += `<text class="dg-g" x="20" y="18">61 inputs, 50 times a second</text>`;
+  segs.forEach(([name, n, f]) => {
+    const w = n * u;
+    s += `<rect class="dg-box ${f ? 'dg-fill-' + f : ''}" x="${x}" y="26" width="${w}" height="34" rx="4"/>`;
+    s += `<text class="dg-s" x="${x + w / 2}" y="48" text-anchor="middle">${n}</text>`;
+    s += `<text class="dg-l" x="${x + w / 2}" y="74" text-anchor="middle">${name}</text>`;
+    x += w;
+  });
+  s += `<path class="dg-e data" d="M380 82 V104" marker-end="url(#oa)"/>`;
+  s += `<rect class="dg-box dg-fill-b" x="190" y="106" width="380" height="40" rx="10"/><text class="dg-t" x="380" y="131" text-anchor="middle">neural network · 3.5 ms mean, 16.7 ms p99 on the Pi</text>`;
+  s += `<path class="dg-e data" d="M380 146 V168" marker-end="url(#oa)"/>`;
+  s += `<text class="dg-g" x="20" y="164">14 outputs: radians from the home pose</text>`;
+  const acts = [10,11,12,13,14,30,31,32,33,20,21,22,23,24], aw = W / 14;
+  acts.forEach((id, i) => {
+    const f = id < 20 ? 'o' : id < 30 ? 'y' : 'b';
+    s += `<rect class="dg-box dg-fill-${f}" x="${X + i * aw}" y="172" width="${aw - 3}" height="30" rx="4"/><text class="dg-s" x="${X + i * aw + aw / 2 - 1.5}" y="192" text-anchor="middle">${id}</text>`;
+  });
+  s += `<text class="dg-l" x="20" y="222">Policy order: left leg 10–14 · neck and head 30–33 · right leg 20–24.</text><text class="dg-l" x="20" y="238">Then: + home pose → degrees → servo goals at 100 Hz → each servo's own PD controller (KP 6).</text>`;
+  s += `<text class="dg-l" x="20" y="254">The beak (34) is not part of the policy: the web page, or later the Xbox trigger, drives it directly.</text>`;
+  s = `<defs><marker id="oa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--wire)"/></marker></defs>` + s;
+  $('#obsSvg').innerHTML = s;
+})();
+
+/* --------------------------------------------------------- reward weights chart */
+(function rewardChart(){
+  const R = [['Foot air time (0.125–0.3 s steps)',3.0],['Track forward/sideways speed',2.0],['Track turning speed',2.0],['Stay upright',2.0],['Follow the head command',2.0],
+    ['Keep a natural pose',1.0],['Foot slip',-0.1],['Jerky actions (action rate)',-0.1],['Body spin',-0.05],['Angular momentum',-0.02],['Self-collision',-1.0]];
+  const L = 250, W = 470, min = -1, max = 3, sx = v => L + (v - min) / (max - min) * W, z = sx(0), RH = 25;
+  let s = '';
+  [-1,0,1,2,3].forEach(t => { s += `<path d="M${sx(t)} 14 V${14 + R.length * RH}" style="stroke:var(--rule);stroke-width:1"/><text class="dg-l" x="${sx(t)}" y="${30 + R.length * RH}" text-anchor="middle">${t}</text>`; });
+  R.forEach(([name, v], i) => {
+    const y = 18 + i * RH, x1 = Math.min(z, sx(v)), w = Math.abs(sx(v) - z);
+    s += `<text class="dg-s" style="font-size:12px;fill:var(--ink)" x="${L - 10}" y="${y + 13}" text-anchor="end">${name}</text>`;
+    s += `<rect x="${x1}" y="${y}" width="${Math.max(w, 1.5)}" height="17" rx="3" style="fill:${v > 0 ? 'var(--ok-soft)' : 'var(--bad-soft)'};stroke:${v > 0 ? 'var(--ok)' : 'var(--bad)'}"/>`;
+    s += `<text class="dg-s" x="${v > 0 ? sx(v) + 6 : x1 - 6}" y="${y + 13}" text-anchor="${v > 0 ? 'start' : 'end'}">${v > 0 ? '+' : ''}${v}</text>`;
+  });
+  s += `<path d="M${z} 14 V${14 + R.length * RH}" style="stroke:var(--ink);stroke-width:1.5"/>`;
+  s += `<text class="dg-l" x="${L}" y="${50 + R.length * RH}">reward weight per term (Mjlab-Velocity-Flat-XgoDuck)</text>`;
+  $('#rewardSvg').innerHTML = s;
+  $('#rewardSvg').setAttribute('viewBox', `0 0 760 ${60 + R.length * RH}`);
+})();
 
 /* --------------------------------------------------------- stage toggle */
 $('#stageToggle').addEventListener('click', () => {
@@ -1066,7 +1458,15 @@ const SCENES = {
   rl: {mode:'getup', tag:'<b>Get-up</b> · keyframed illustration'},
   roadmap: {mode:'walk', speed:.35, tag:'<b>Roadmap</b> · next: stand and walk'},
   mistakes: {mode:'pose', pose:'sit', tag:'<b>Sit pose</b> · resting between fixes'},
-  bom: {mode:'explode', tag:'<b>Parts</b> · everything that went in'}
+  bom: {mode:'explode', tag:'<b>Parts</b> · everything that went in'},
+  plan: {mode:'walk', speed:.45, tag:'<b>The plan</b> · seven phases, five gates'},
+  ladder: {mode:'pose', pose:'zero', tag:'<b>Rung 1</b> · is this what the legs look like?'},
+  'rl-obs': {mode:'walk', speed:.5, tag:'<b>Policy</b> · 61 numbers in, 14 joint targets out'},
+  'rl-train': {mode:'walk', speed:.8, tag:'<b>Training</b> · 4096 ducks at once'},
+  'rl-gap': {mode:'look', hl:'head', tag:'<b>Heavier head</b> · about +23 g with the Pi'},
+  'rl-workflow': {mode:'getup', tag:'<b>Retrain</b> · keyframed illustration'},
+  'rl-skills': {mode:'look', hl:'head', tag:'<b>New skills</b> · the camera steers the head'},
+  'rl-risks': {mode:'pose', pose:'sit', tag:'<b>Risks</b> · soft mat, slow limits'}
 };
 function enterScene(id){
   const sc = SCENES[id]; if (!sc) return;
@@ -1079,6 +1479,7 @@ function enterScene(id){
   sceneHL = sc.hl ? HL[sc.hl] : []; highlight = sceneHL; setEmissive();
   controls.autoRotate = !!sc.spin && !reduceMotion && performance.now() - userTouched > 8000;
   if (sc.mode === 'getup') getupLoop();
+  markPlan();
 }
 function getupLoop(){
   if (reduceMotion) { target = {...POSES.home}; mode = 'pose'; return; }
@@ -1090,13 +1491,13 @@ function getupLoop(){
     {dur: 1300, to: POSES.sit, pitch: 0},
     {dur: 1500, to: POSES.home},
     {dur: 2500, to: POSES.home}
-  ], () => { if (activeSection === 'rl') getupLoop(); });
+  ], () => { if (activeSection === 'rl' || activeSection === 'rl-workflow') getupLoop(); });
 }
 
 /* ---- section tracking */
 const sections = [...document.querySelectorAll('[data-duck]')];
 const navLinks = [...document.querySelectorAll('.nav a.ph')];
-const PHASE_OF = {top:-1,idea:0,original:0,map:7,print:1,head:1,power:1,wiring:1,software:2,calibration:2,tests:2,imu:3,stand:3,controller:3,camera:3,rl:4,roadmap:4,mistakes:5,bom:6};
+const PHASE_OF = {plan:9,ladder:3,'rl-obs':4,'rl-train':4,'rl-gap':4,'rl-workflow':4,'rl-skills':4,'rl-risks':4,top:-1,idea:0,original:0,map:7,print:1,head:1,power:1,wiring:1,software:2,calibration:2,tests:2,imu:3,stand:3,controller:3,camera:3,rl:4,roadmap:4,mistakes:5,bom:6};
 function track(){
   const line = innerHeight * 0.42; let act = sections[0];
   for (const s of sections) { if (s.getBoundingClientRect().top < line) act = s; }
@@ -1210,17 +1611,17 @@ function fitCamera(){
 }
 
 function fallback(msg){
-  bench.insertAdjacentHTML('beforeend', `<div class="bench-fallback"><div>${msg}<br>Open the page from a web server to see the duck in 3D.<br><img src="assets/cad_zero_pose.jpg" width="1400" height="933" alt="Zero pose render of the duck"></div></div>`);
+  bench.insertAdjacentHTML('beforeend', `<div class="bench-fallback"><div>${msg}<br><img src="assets/cad_zero_pose.jpg" width="1400" height="933" alt="Zero pose render of the duck"></div></div>`);
   tag.innerHTML = '<b>3D unavailable</b>';
 }
 
-fetch('assets/duck_model.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(M => {
+(window.DUCK_MODEL ? Promise.resolve(window.DUCK_MODEL) : fetch('assets/duck_model.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })).then(M => {
   const geoms = {}; Object.entries(M.meshes).forEach(([n, m]) => geoms[n] = makeGeom(m));
   build(M.root, zup, geoms);
   applyPose(); updateChips(); fitCamera();
   new ResizeObserver(fitCamera).observe(bench);
   const h = location.hash.slice(1); if (h && document.getElementById(h)) document.getElementById(h).scrollIntoView();
   track(); requestAnimationFrame(frame);
-}).catch(() => { renderer.domElement.remove(); fallback('The 3D model file could not be loaded.'); track(); });
+}).catch(() => { renderer.domElement.remove(); fallback('The 3D model file could not be loaded. Keep the assets folder next to this page.'); track(); });
 })();
 </script>
