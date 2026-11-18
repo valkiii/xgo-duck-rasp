@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: engineering-notebook scrollytelling. Story column on the left, a sticky "bench"
-   on the right with the live 3D duck and a clickable story line (where you are, where the project is). */
+/* Layout: scrollytelling without boxes. Chapters alternate sides; the 3D duck floats over the page in the
+   free half and hops across between chapters; a translucent story line docks on the right edge. */
 :root{
   --paper:#EDF0F3; --card:#F8F9FB; --ink:#18212B; --muted:#56626F; --rule:#CDD4DC; --grid:#DCE2E8;
   --pla-orange:#E25A17; --pla-yellow:#E9AE0B; --wire:#2B5FD9; --ok:#1F8A4C; --warn:#B9770E; --bad:#C23B2E;
@@ -521,7 +521,7 @@ figure img{border:0; border-radius:6px; background:transparent}
   <article class="chapter" id="print" data-duck="print">
     <h3><small>Bambu printer · PLA</small>Printing the body</h3>
     <p>The body is printed from the upstream <code>structure/</code> files in orange and yellow PLA, with TPU for the feet and beak. Before assembly, each of the 15 servos was given its own ID and centred: 10 to 14 for the left leg, 20 to 24 for the right, 30 to 33 for the neck and head, and 34 for the beak. By 3 November the mechanics were almost fully assembled.</p>
-    <p>On the right, the model is pulled apart along its joints. Each piece is one body in the simulation, and each joint between two bodies is one servo.</p>
+    <p>Next to this text, the model is pulled apart along its joints. Each piece is one body in the simulation, and each joint between two bodies is one servo.</p>
     <p>I only changed parts where the Pi forced it. Every new part is a drop-in replacement in the same coordinate frame as the original, and all of them are listed in <code>PRINT_LIST.md</code>. The first of those parts came from a plain problem: the Pi had no obvious place to live.</p>
     <figure><img src="assets/photo_sitting.jpg" width="1050" height="1400" class="portrait" alt="The assembled orange and yellow duck sitting on a table, Pi Zero mounted on top of the head plate" loading="lazy"><figcaption>The duck sitting on the table. The yellow head plate carries the Pi Zero 2 W, and the head shell isn't on yet.</figcaption></figure>
   </article>
@@ -1367,7 +1367,7 @@ function playWords(dt, duck){
       const dx = L.x - I.x, dy = L.y - I.y, d = Math.hypot(dx, dy);
       if (d < I.rad) { const k = (1 - d / I.rad) * I.power; L.vx += dx / (d || 1) * k * .7 + (Math.random() - .5) * k * .4; L.vy -= k * (.7 + Math.random() * .6); L.vr += (Math.random() - .5) * k * 3; }
     }
-    if (L.kickAt && now >= L.kickAt) { L.vy -= L.kickV; L.vr += (Math.random() - .5) * 500; L.kickAt = 0; }
+    if (L.kickAt && now >= L.kickAt) { L.vy -= L.kickV; L.vr += (Math.random() - .5) * 260; L.kickAt = 0; }
     L.vx += (170 * (tx - L.ox) - 13 * L.vx) * dt; L.vy += (170 * (ty - L.oy) - 13 * L.vy) * dt; L.vr += (150 * (tr - L.r) - 12 * L.vr) * dt;
     L.ox += L.vx * dt; L.oy += L.vy * dt; L.r += L.vr * dt;
     if (Math.abs(L.ox) + Math.abs(L.oy) + Math.abs(L.r) > .2 || Math.abs(L.vx) + Math.abs(L.vy) > 3) {
@@ -1423,10 +1423,8 @@ function wordPlay(now, beak){
   if (e > 700 && !peckWord.nod) { peckWord.nod = true; peckT = now; }
   if (e > 880 && !peckWord.hit && beak) {
     peckWord.hit = true;
-    peckWord.letters.forEach((L, i) => {
-      const toward = (beak.x + scrollX - L.x);
-      L.vy -= 380 + Math.random() * 260; L.vx += toward * (.6 + Math.random() * .8) + (i - peckWord.letters.length / 2) * 22; L.vr += (Math.random() - .5) * 900;
-    });
+    const n = peckWord.letters.length, mid = (peckWord.letters[0].x + peckWord.letters[n - 1].x) / 2, toward = Math.sign(beak.x + scrollX - mid);
+    peckWord.letters.forEach((L, i) => { L.kickAt = now + i * 28; L.kickV = 210 + 40 * Math.sin(i * 1.3); L.vx += toward * 40; L.vr += toward * 120; });
   }
 }
 function gazeTarget(){
@@ -1569,6 +1567,7 @@ function applyPose(){
   bodies.forEach(b => { if (b.node !== trunkNode) b.node.position.copy(b.base).multiplyScalar(1 + explode * 1.25); });
   if (trunkNode) trunkNode.quaternion.copy(trunkBaseQ).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), THREE.MathUtils.degToRad(rootPitch + lean)));
   world.rotation.y = heading;
+  zup.scale.setScalar(10 / (1 + explode * .55));   // pulled apart, it would not fit the frame
   zup.position.y = 0; world.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(zup);
   zup.position.y = -box.min.y + 0.002 + hopY;
@@ -1782,7 +1781,7 @@ function setSide(id){
   push(now, 'arrive', side === 'l' ? -1 : 1, side === 'l' ? 'left' : 'right');
   push(was, 'shove', side === 'l' ? 1 : -1, prev === 'l' ? 'left' : 'right');
 }
-function placeTag(){ $('.bench-head').style.left = WIDE.matches ? `calc(${((filmX + 1) / 2 * 100).toFixed(1)}% - 150px)` : ''; }
+function placeTag(){ $('.bench-head').style.left = WIDE.matches ? Math.max(16, Math.min(canvasRect.width - 330, (filmX + 1) / 2 * canvasRect.width - 150)).toFixed(0) + 'px' : ''; }
 WIDE.addEventListener('change', () => { filmX = WIDE.matches ? filmFor(duckSide) : 0; placeTag(); });
 
 const navLinks = [...document.querySelectorAll('.nav a.ph')];
